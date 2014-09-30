@@ -53,6 +53,9 @@
 (defvar forth-font-lock-keywords
   '((forth-match-colon-definition 3 font-lock-function-name-face)))
 
+(unless (fboundp 'prog-mode)
+  (defalias 'prog-mode 'fundamental-mode))
+
 ;;;### autoload
 (define-derived-mode forth-mode prog-mode "Forth"
 		     "Major mode for editing Forth files."
