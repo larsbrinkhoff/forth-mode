@@ -1,6 +1,8 @@
 ;;;; -*- emacs-lisp -*-
 ;;; Copyright 2014 Lars Brinkhoff
 
+(load-file "forth-block-mode.el")
+
 (defvar forth-mode-map
   (let ((map (make-sparse-keymap)))
     ;; (define-key (kbd "C-x C-e") #'forth-eval-last-sexp)
@@ -60,6 +62,8 @@
 (define-derived-mode forth-mode prog-mode "Forth"
 		     "Major mode for editing Forth files."
 		     :syntax-table forth-mode-syntax-table
+  (if (forth-block-p)
+      (forth-block-mode))
   (setq font-lock-defaults '(forth-font-lock-keywords))
   (setq ;; font-lock-defaults
 	indent-line-function #'forth-indent
