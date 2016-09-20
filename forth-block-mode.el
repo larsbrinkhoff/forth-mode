@@ -1,3 +1,4 @@
+;;;### autoload
 (defun forth-block-p ()
   "Guess whether the current buffer is a Forth block file."
   (message (format "%s %s" (point-max) (logand (point-max) 1023)))
@@ -77,6 +78,7 @@
     (while (> (- (point) (line-beginning-position)) 64)
       (delete-backward-char 1))))
 
+;;;### autoload
 (define-minor-mode forth-block-mode
   "Minor mode for Forth code in blocks."
   :lighter " block"
