@@ -39,8 +39,8 @@
     (modify-syntax-entry ?\} ">" table)
     (modify-syntax-entry ?\: "(" table)
     (modify-syntax-entry ?\; ")" table)
-    (modify-syntax-entry ?[ "(" table)
-    (modify-syntax-entry ?] ")" table)
+    (modify-syntax-entry ?[ "_" table)
+    (modify-syntax-entry ?] "_" table)
     (modify-syntax-entry ?\? "_" table)
     (modify-syntax-entry ?! "_" table)
     (modify-syntax-entry ?@ "_" table)
@@ -48,12 +48,14 @@
     (modify-syntax-entry ?> "_" table)
     (modify-syntax-entry ?. "_" table)
     (modify-syntax-entry ?, "_" table)
+    (modify-syntax-entry ?' "_" table)
+    (modify-syntax-entry ?" "\"" table)
     table))
 
 (defvar forth-mode-hook)
 
 (defvar forth-font-lock-keywords
-  '((forth-match-colon-definition 3 font-lock-function-name-face)))
+  '((forth-match-definition 3 font-lock-function-name-face)))
 
 (unless (fboundp 'prog-mode)
   (defalias 'prog-mode 'fundamental-mode))
@@ -84,7 +86,7 @@
 ;;; : ; does> variable constant value
 ;;; if else then  do loop begin while repeat again until  postpone
 
-(defun forth-match-colon-definition (limit)
+(defun forth-match-definition (limit)
   (search-forward-regexp "\\(^\\|\\s-\\)\\(\\S-*:\\|code\\|defer\\|2?variable\\|create\\|2?value\\|2?constant\\)\\s-+\\([[:graph:]]+\\)"
 			 limit t))
 
