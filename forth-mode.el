@@ -1,7 +1,7 @@
 ;;;; -*- emacs-lisp -*-
 ;;; Copyright 2014 Lars Brinkhoff
 
-(load-file "forth-block-mode.el")
+(load-library "forth-block-mode.el")
 
 (defvar forth-mode-map
   (let ((map (make-sparse-keymap)))
