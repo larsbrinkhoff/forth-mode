@@ -1,5 +1,14 @@
-;;;; -*- emacs-lisp -*-
+;;; forth-mode --- Programming language mode for Forth
 ;;; Copyright 2014 Lars Brinkhoff
+
+;; Author: Lars Brinkhoff <lars@nocrew.org>
+;; Keywords: languages forth
+;; URL: http://github.com/larsbrinkhoff/forth-mode
+
+;;; Commentary:
+;; Programming language mode for Forth
+
+;;; Code:
 
 (load-library "forth-block-mode.el")
 
@@ -101,3 +110,4 @@
   (forth-interaction-send (concat "include " file)))
 
 (provide 'forth-mode)
+;;; forth-mode.el ends here
