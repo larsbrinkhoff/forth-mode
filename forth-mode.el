@@ -4,6 +4,7 @@
 ;; Author: Lars Brinkhoff <lars@nocrew.org>
 ;; Keywords: languages forth
 ;; URL: http://github.com/larsbrinkhoff/forth-mode
+;; Version: 0.1
 
 ;;; Commentary:
 ;; Programming language mode for Forth
