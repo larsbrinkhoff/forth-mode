@@ -13,7 +13,7 @@
     ;; (define-key (kbd "C-x C-e") #'forth-eval-last-sexp)
     ;; (define-key (kbd "C-M-x") #'forth-eval-defun)
     ;; (define-key (kbd "C-c C-r") #'forth-eval-region)
-    ;; (define-key (kbd "C-c C-l") #'forth-load-file)
+    (define-key map (kbd "C-c C-l") 'forth-load-file)
     ;; (define-key (kbd "C-c :") #'forth-eval-expression)
     ;; (define-key (kbd "C-c C-c") #'forth-compile-defun)
     ;; (define-key (kbd "C-c C-k") #'forth-compile-and-load-file)
@@ -95,5 +95,10 @@
 (defun forth-kill-sexp ())
 (defun forth-beginning-of-defun ())
 (defun forth-end-of-defun ())
+
+(defun forth-load-file (file)
+  (interactive (list (buffer-file-name (current-buffer))))
+  (forth-interaction-send (concat "include " file)
+			  (lambda (x) (message "Forth: %s" x))))
 
 (provide 'forth-mode)
