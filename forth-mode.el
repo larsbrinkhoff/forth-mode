@@ -10,7 +10,7 @@
 
 ;;; Code:
 
-(load-library "forth-block-mode.el")
+(require 'forth-block-mode)
 
 (defvar forth-mode-map
   (let ((map (make-sparse-keymap)))
