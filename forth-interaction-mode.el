@@ -30,6 +30,8 @@
   (message "Forth: %s" arg)
   (forth-interaction-kill (process-buffer proc)))
 
+(defvar forth-executable "gforth")
+
 ;;;### autoload
 (defun forth ()
   "Start an interactive forth session."
@@ -37,7 +39,7 @@
   (let ((buffer (get-buffer-create "*forth*")))
     (pop-to-buffer-same-window buffer)
     (unless (comint-check-proc buffer)
-      (make-comint-in-buffer "forth" buffer "forth")
+      (make-comint-in-buffer "forth" buffer forth-executable)
       (set-process-sentinel (get-buffer-process buffer)
 			    'forth-interaction-sentinel)
       (forth-interaction-mode)
