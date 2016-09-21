@@ -90,6 +90,7 @@
 	  ("Constants"
 	   "\\s-2?constant\\s-+\\(\\(\\sw\\|\\s_\\)+\\)" 1))))
 
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.\\(f\\|fs\\|fth\\)\\'" . forth-mode))
 
 ;;; : ; does> variable constant value
