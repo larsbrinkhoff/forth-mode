@@ -56,3 +56,5 @@
 (defun forth-stack-comments-mode ()
   (interactive)
   (add-hook 'post-command-hook 'forth-stack-comment nil t))
+
+(provide 'forth-parse)

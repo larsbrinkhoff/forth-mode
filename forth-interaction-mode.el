@@ -69,3 +69,5 @@
     (setq forth-interaction-callback callback)
     (comint-send-string proc string)
     (comint-send-string proc "\n")))
+
+(provide 'forth-interaction-mode)
