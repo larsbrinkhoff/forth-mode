@@ -7,6 +7,7 @@
   (let ((map (copy-keymap forth-mode-map)))
     (set-keymap-parent map comint-mode-map)
     (define-key map (kbd "C-c C-k") 'forth-kill)
+    (define-key map (kbd "C-c C-r") 'forth-restart)
     map)
   "Keymap for Forth interaction.")
 
@@ -50,6 +51,12 @@
 		'forth-interaction-preoutput-filter nil t)
       (setq forth-interaction-buffer buffer))))
       
+;;;### autoload
+(defun forth-restart ()
+  (interactive)
+  (forth-kill)
+  (forth))
+
 (defun ensure-forth ()
   (unless forth-interaction-buffer
     (forth))
