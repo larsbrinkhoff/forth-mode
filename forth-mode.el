@@ -98,7 +98,6 @@
 
 (defun forth-load-file (file)
   (interactive (list (buffer-file-name (current-buffer))))
-  (forth-interaction-send (concat "include " file)
-			  (lambda (x) (message "Forth: %s" x))))
+  (forth-interaction-send (concat "include " file)))
 
 (provide 'forth-mode)
