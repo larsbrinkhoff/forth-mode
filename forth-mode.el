@@ -1,4 +1,4 @@
-;;; forth-mode --- Programming language mode for Forth
+;;; forth-mode.el --- Programming language mode for Forth
 ;;; Copyright 2014 Lars Brinkhoff
 
 ;; Author: Lars Brinkhoff <lars@nocrew.org>
