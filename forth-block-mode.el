@@ -1,15 +1,22 @@
+(require 'cl)
+(require 'forth-mode)
+
+(defun forth-line (n)
+  (goto-char (point-min))
+  (forward-line (1- n)))
+
 (defun forth-block-p ()
   "Guess whether the current buffer is a Forth block file."
   (message (format "%s %s" (point-max) (logand (point-max) 1023)))
   (and (eq (logand (point-max) 1023) 1)
        (save-excursion
-	 (beginning-of-buffer)
+	 (forth-beginning)
 	 (not (search-forward "\n" 1024 t)))))
 
 (defun forth-unblockify ()
   (let ((after-change-functions nil))
     (save-excursion
-      (beginning-of-buffer)
+      (forth-beginning)
       (while (ignore-errors (forward-char 64) t)
 	(insert ?\n))
       (let ((delete-trailing-lines t))
@@ -28,7 +35,7 @@
 (defun forth-blockify ()
   (let ((after-change-functions nil))
     (save-excursion
-      (beginning-of-buffer)
+      (forth-beginning)
       (while (forth-pad-line))
       (while (plusp (logand (point) 1023))
 	(insert " "))
@@ -64,18 +71,18 @@
   (cond ((plusp forth-change-newlines)
 	 (let ((n (logand (+ (line-number-at-pos) 15) -16)))
 	   (save-excursion
-	     (goto-line (1+ n))
+	     (forth-line (1+ n))
 	     (delete-region (line-beginning-position) (line-end-position))
 	     (delete-char 1))))
 	((minusp forth-change-newlines)
 	 (let ((n (logand (+ (line-number-at-pos) 15) -16)))
 	   (save-excursion
-	     (goto-line n)
+	     (forth-line n)
 	     (insert "\n")))))
   (save-excursion
     (end-of-line)
     (while (> (- (point) (line-beginning-position)) 64)
-      (delete-backward-char 1))))
+      (delete-char -1))))
 
 (define-minor-mode forth-block-mode
   "Minor mode for Forth code in blocks."

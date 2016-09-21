@@ -110,5 +110,8 @@
   (interactive (list (buffer-file-name (current-buffer))))
   (forth-interaction-send (concat "include " file)))
 
+(defun forth-beginning ()
+  (goto-char (point-min)))
+
 (provide 'forth-mode)
 ;;; forth-mode.el ends here

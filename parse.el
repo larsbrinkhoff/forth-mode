@@ -1,3 +1,5 @@
+(require 'forth-mode)
+
 (defvar forth-stack-comments (make-hash-table :test 'equal))
 
 (defun forth-parse-colon-definition ()
@@ -25,7 +27,7 @@
 (defun forth-parse-buffer (&optional buffer)
   (setq buffer (or buffer (current-buffer)))
   (save-excursion
-    (beginning-of-buffer)
+    (forth-beginning)
     (end-of-defun)
     (beginning-of-defun)
     (while t

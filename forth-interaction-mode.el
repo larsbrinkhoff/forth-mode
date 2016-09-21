@@ -1,4 +1,5 @@
 (require 'comint)
+(require 'forth-mode)
 
 (defvar forth-interaction-buffer nil)
 (defvar forth-interaction-callback nil)
