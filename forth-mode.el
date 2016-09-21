@@ -10,8 +10,6 @@
 
 ;;; Code:
 
-(require 'forth-block-mode)
-
 (defvar forth-mode-map
   (let ((map (make-sparse-keymap)))
     ;; (define-key (kbd "C-x C-e") #'forth-eval-last-sexp)
@@ -65,6 +63,14 @@
 
 (defvar forth-font-lock-keywords
   '((forth-match-definition 3 font-lock-function-name-face)))
+
+(defun forth-block-p ()
+  "Guess whether the current buffer is a Forth block file."
+  (message (format "%s %s" (point-max) (logand (point-max) 1023)))
+  (and (eq (logand (point-max) 1023) 1)
+       (save-excursion
+	 (forth-beginning)
+	 (not (search-forward "\n" 1024 t)))))
 
 (unless (fboundp 'prog-mode)
   (defalias 'prog-mode 'fundamental-mode))

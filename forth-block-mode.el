@@ -5,14 +5,6 @@
   (goto-char (point-min))
   (forward-line (1- n)))
 
-(defun forth-block-p ()
-  "Guess whether the current buffer is a Forth block file."
-  (message (format "%s %s" (point-max) (logand (point-max) 1023)))
-  (and (eq (logand (point-max) 1023) 1)
-       (save-excursion
-	 (forth-beginning)
-	 (not (search-forward "\n" 1024 t)))))
-
 (defun forth-unblockify ()
   (let ((after-change-functions nil))
     (save-excursion
@@ -84,6 +76,7 @@
     (while (> (- (point) (line-beginning-position)) 64)
       (delete-char -1))))
 
+;;;###autoload
 (define-minor-mode forth-block-mode
   "Minor mode for Forth code in blocks."
   :lighter " block"
