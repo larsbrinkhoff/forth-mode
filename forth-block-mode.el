@@ -89,8 +89,8 @@
   :lighter " block"
   (setq require-final-newline nil)
   (forth-unblockify)
-  (add-hook (make-local-variable 'before-save-hook) #'forth-blockify)
-  (add-hook (make-local-variable 'after-save-hook) #'forth-unblockify)
+  (add-hook 'before-save-hook 'forth-blockify nil t)
+  (add-hook 'after-save-hook 'forth-unblockify nil t)
   (add-to-list (make-local-variable 'before-change-functions)
 	       #'forth-before-change)
   (add-to-list (make-local-variable 'after-change-functions)
