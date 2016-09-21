@@ -77,8 +77,6 @@
       (forth-block-mode))
   (setq font-lock-defaults '(forth-font-lock-keywords))
   (setq ;; font-lock-defaults
-	indent-line-function #'forth-indent
-	comment-indent-function #'forth-indent-comment
 	comment-start-skip "\\((\\*?\\|\\\\\\) *"
 	comment-start "("
 	comment-end ")"
@@ -99,12 +97,6 @@
 (defun forth-match-definition (limit)
   (search-forward-regexp "\\(^\\|\\s-\\)\\(\\S-*:\\|code\\|defer\\|2?variable\\|create\\|2?value\\|2?constant\\)\\s-+\\([[:graph:]]+\\)"
 			 limit t))
-
-(defun forth-forward-sexp ())
-(defun forth-backward-sexp ())
-(defun forth-kill-sexp ())
-(defun forth-beginning-of-defun ())
-(defun forth-end-of-defun ())
 
 (defun forth-load-file (file)
   (interactive (list (buffer-file-name (current-buffer))))
