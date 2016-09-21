@@ -69,7 +69,7 @@
 (unless (fboundp 'prog-mode)
   (defalias 'prog-mode 'fundamental-mode))
 
-;;;### autoload
+;;;###autoload
 (define-derived-mode forth-mode prog-mode "Forth"
 		     "Major mode for editing Forth files."
 		     :syntax-table forth-mode-syntax-table

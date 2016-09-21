@@ -36,7 +36,7 @@
 
 (defvar forth-executable "gforth")
 
-;;;### autoload
+;;;###autoload
 (defun forth ()
   "Start an interactive forth session."
   (interactive)
@@ -51,7 +51,7 @@
 		'forth-interaction-preoutput-filter nil t)
       (setq forth-interaction-buffer buffer))))
       
-;;;### autoload
+;;;###autoload
 (defun forth-restart ()
   (interactive)
   (forth-kill)
@@ -62,7 +62,7 @@
     (forth))
   (get-buffer-process forth-interaction-buffer))
 
-;;;### autoload
+;;;###autoload
 (defun forth-interaction-send (string &optional callback)
   (let ((proc (ensure-forth)))
     (setq forth-interaction-callback callback)
