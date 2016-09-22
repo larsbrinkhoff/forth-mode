@@ -33,7 +33,7 @@
   (message "Forth: %s" arg)
   (forth-kill (process-buffer proc)))
 
-(defvar forth-executable "gforth")
+(defvar forth-executable nil)
 
 (defvar run-forth-hooks)
 
@@ -41,6 +41,9 @@
 (defun run-forth ()
   "Start an interactive forth session."
   (interactive)
+  (unless forth-executable
+    (setq forth-executable
+	  (read-string "Forth executable: ")))
   (let ((buffer (get-buffer-create "*forth*")))
     (pop-to-buffer-same-window buffer)
     (unless (comint-check-proc buffer)
