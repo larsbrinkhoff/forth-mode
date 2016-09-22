@@ -35,6 +35,8 @@
 
 (defvar forth-executable "gforth")
 
+(defvar run-forth-hooks)
+
 ;;;###autoload
 (defun run-forth ()
   "Start an interactive forth session."
@@ -42,6 +44,7 @@
   (let ((buffer (get-buffer-create "*forth*")))
     (pop-to-buffer-same-window buffer)
     (unless (comint-check-proc buffer)
+      (run-hooks 'run-forth-hooks)
       (make-comint-in-buffer "forth" buffer forth-executable)
       (set-process-sentinel (get-buffer-process buffer)
 			    'forth-interaction-sentinel)
