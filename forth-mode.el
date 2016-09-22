@@ -96,7 +96,7 @@
 	   "\\s-2?constant\\s-+\\(\\(\\sw\\|\\s_\\)+\\)" 1))))
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.\\(f\\|fs\\|fth\\)\\'" . forth-mode))
+(add-to-list 'auto-mode-alist '("\\.\\(f\\|fs\\|fth\\|4th\\)\\'" . forth-mode))
 
 ;;; : ; does> variable constant value
 ;;; if else then  do loop begin while repeat again until  postpone
