@@ -6,7 +6,8 @@
 Features in progress:
 
 - Recognises definitions and moves by balanced expressions.
-- Interact with a Forth session: enter commands, load files.
+- Interact with a Forth session: enter commands, load files, evalutate
+  expressions.
 - Display stack comment when moving the cursor over a word.
 - Edit block files.
 
