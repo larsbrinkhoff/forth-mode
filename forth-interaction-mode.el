@@ -76,4 +76,8 @@
       (accept-process-output proc 0.1))
     forth-result))
 
+;;;###autoload
+(defun forth-words ()
+  (split-string (forth-interaction-send "words")))
+
 (provide 'forth-interaction-mode)
