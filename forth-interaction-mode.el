@@ -19,9 +19,7 @@
 
 (defun forth-interaction-preoutput-filter (text)
   (if forth-interaction-callback
-      (prog1 (when forth-interaction-callback
-	       (funcall forth-interaction-callback text))
-	(setq forth-interaction-callback nil))
+      (funcall forth-interaction-callback text)
       text))
 
 (defun forth-kill (&optional buffer)
@@ -64,10 +62,18 @@
   (get-buffer-process forth-interaction-buffer))
 
 ;;;###autoload
-(defun forth-interaction-send (string &optional callback)
-  (let ((proc (forth-ensure)))
-    (setq forth-interaction-callback callback)
-    (comint-send-string proc string)
-    (comint-send-string proc "\n")))
+(defun forth-interaction-send (&rest strings)
+  (let* ((proc (forth-ensure))
+	 (forth-result nil)
+	 (forth-interaction-callback (lambda (x)
+				       (setq forth-result (concat forth-result x))
+				       ""))
+	 (end-time (+ (float-time) .4)))
+    (dolist (s strings)
+      (comint-send-string proc s))
+    (comint-send-string proc "\n")
+    (while (< (float-time) end-time)
+      (accept-process-output proc 0.1))
+    forth-result))
 
 (provide 'forth-interaction-mode)

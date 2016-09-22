@@ -107,7 +107,7 @@
 
 (defun forth-load-file (file)
   (interactive (list (buffer-file-name (current-buffer))))
-  (forth-interaction-send (concat "include " file)))
+  (forth-interaction-send "include " file))
 
 (defun forth-beginning ()
   (goto-char (point-min)))
