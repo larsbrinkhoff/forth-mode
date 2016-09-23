@@ -39,3 +39,12 @@ extensions `.f`, `.fs`, `.fth`, and `.4th` are recognised
 automatically.
 
 To start an interactive Forth session, type `M-x run-forth`.
+
+Key bindings:
+
+- `C-M-a`, `C-M-e` - beginning / end of colon definition.
+- `C-M-f`, `C-M-b` - forward / backward expression (not very useful yet).
+- `C-M-h` - mark colon definition.
+- `C-c C-l` - load file.
+- `C-c C-r` - evaluate region.
+- `C-c C-k` - kill interactive Forth.
