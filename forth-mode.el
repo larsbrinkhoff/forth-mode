@@ -15,12 +15,11 @@
   (let ((map (make-sparse-keymap)))
     ;; (define-key (kbd "C-x C-e") #'forth-eval-last-sexp)
     ;; (define-key (kbd "C-M-x") #'forth-eval-defun)
-    ;; (define-key (kbd "C-c C-r") #'forth-eval-region)
+    (define-key map (kbd "C-c C-r") #'forth-eval-region)
     ;; eval-buffer
     ;; compile-region
     ;; (define-key (kbd "C-x C-e") #'forth-eval-last-sexp)
     ;; (define-key (kbd "C-M-x") #'forth-eval-defun)
-    ;; (define-key (kbd "C-c C-r") #'forth-eval-region)
     (define-key map (kbd "C-c C-l") 'forth-load-file)
     ;; (define-key (kbd "C-c :") #'forth-eval-expression)
     ;; (define-key (kbd "C-c C-c") #'forth-compile-defun)
