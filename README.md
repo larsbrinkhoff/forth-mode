@@ -30,7 +30,7 @@ Manual:
     (pushnew "DIR" load-path)
     (require 'forth-mode)
     (require 'forth-block-mode)
-    (require 'forth-interacton-mode)
+    (require 'forth-interaction-mode)
 
 ### Usage
 
