@@ -10,9 +10,6 @@ Features in progress:
   expressions.
 - Display stack comment when moving the cursor over a word.
 - Edit block files.
-
-Planned:
-
 - Tab completion.
 - Query a running Forth about words, search order, etc.
 
@@ -48,3 +45,4 @@ Key bindings:
 - `C-c C-l` - load file.
 - `C-c C-r` - evaluate region.
 - `C-c C-k` - kill interactive Forth.
+- `M-TAB`, `C-M-i` - complete-symbol.

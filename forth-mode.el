@@ -58,6 +58,20 @@
 (defvar forth-font-lock-keywords
   '((forth-match-definition 3 font-lock-function-name-face)))
 
+(defun forth-symbol-start ()
+  (save-excursion
+    (re-search-backward "[^[:graph:]]")
+    (1+ (point))))
+
+(defun forth-symbol-end ()
+  (save-excursion
+    (re-search-forward "[^[:graph:]]")
+    (1- (point))))
+
+(defun forth-expand-symbol ()
+  ;; Append result from (imenu--make-index-alist t)?
+  (list (forth-symbol-start) (forth-symbol-end) (forth-words)))
+
 (defun forth-block-p ()
   "Guess whether the current buffer is a Forth block file."
   (and (> (point-max) 1)
@@ -76,6 +90,7 @@
   (if (forth-block-p)
       (forth-block-mode))
   (setq font-lock-defaults '(forth-font-lock-keywords))
+  (setq-local completion-at-point-functions '(forth-expand-symbol))
   (setq ;; font-lock-defaults
 	comment-start-skip "\\((\\*?\\|\\\\\\) *"
 	comment-start "("
