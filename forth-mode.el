@@ -106,6 +106,17 @@
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.\\(f\\|fs\\|fth\\|4th\\)\\'" . forth-mode))
 
+(unless (fboundp 'with-eval-after-load)
+  (defmacro with-eval-after-load (lib &rest forms)
+    `(eval-after-load ,lib '(progn ,@forms))))
+
+(eval-after-load "speedbar"
+  '(progn
+    (speedbar-add-supported-extension ".f")
+    (speedbar-add-supported-extension ".fs")
+    (speedbar-add-supported-extension ".fth")
+    (speedbar-add-supported-extension ".4th")))
+
 ;;; : ; does> variable constant value
 ;;; if else then  do loop begin while repeat again until  postpone
 
