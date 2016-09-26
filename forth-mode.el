@@ -13,26 +13,20 @@
 
 (defvar forth-mode-map
   (let ((map (make-sparse-keymap)))
-    ;; (define-key (kbd "C-x C-e") #'forth-eval-last-sexp)
-    ;; (define-key (kbd "C-M-x") #'forth-eval-defun)
     (define-key map (kbd "C-c C-r") #'forth-eval-region)
-    ;; eval-buffer
-    ;; compile-region
-    ;; (define-key (kbd "C-x C-e") #'forth-eval-last-sexp)
-    ;; (define-key (kbd "C-M-x") #'forth-eval-defun)
     (define-key map (kbd "C-c C-l") 'forth-load-file)
-    ;; (define-key (kbd "C-c :") #'forth-eval-expression)
-    ;; (define-key (kbd "C-c C-c") #'forth-compile-defun)
-    ;; (define-key (kbd "C-c C-k") #'forth-compile-and-load-file)
-    ;; (define-key (kbd "C-c M-k") #'forth-compile-file)
-    ;; (define-key (kbd "C-x `") #'forth-next-error)
-    ;; (define-key (kbd "M-n") #'forth-next-note)
-    ;; (define-key (kbd "M-p") #'forth-previous-note)
-    ;; (define-key (kbd "M-TAB") #'forth-complete-symbol)
-    ;; (define-key (kbd "M-.") #'forth-edit-definition)
-    ;; (define-key (kbd "C-c M-d") #'forth-disassemble-symbol)
-    ;; (define-key (kbd "C-c M-d") #'forth-disassemble-symbol)
-    ;; (define-key (kbd "C-c C-z") #'forth-switch-to-output-buffer)
+    ;; (define-key map (kbd "C-M-x") #'forth-eval-defun)
+    ;; (define-key map (kbd "C-c C-c") 'eval-buffer)
+    ;; (define-key map (kbd "C-x C-e") #'forth-eval-last-sexp)
+    ;; (define-key map (kbd "C-M-x") #'forth-eval-defun)
+    ;; (define-key map (kbd "C-c :") #'forth-eval-expression)
+    ;; (define-key map (kbd "C-x `") #'forth-next-error)
+    ;; (define-key map (kbd "M-n") #'forth-next-note)
+    ;; (define-key map (kbd "M-p") #'forth-previous-note)
+    ;; (define-key map (kbd "M-TAB") #'forth-complete-symbol)
+    ;; (define-key map (kbd "M-.") #'forth-find-definition)
+    ;; (define-key map (kbd "C-c C-s") #'forth-see)
+    ;; (define-key map (kbd "C-c C-z") #'forth-switch-to-output-buffer)
     map))
 
 (defvar forth-mode-syntax-table
@@ -66,8 +60,8 @@
 
 (defun forth-block-p ()
   "Guess whether the current buffer is a Forth block file."
-  (message (format "%s %s" (point-max) (logand (point-max) 1023)))
-  (and (eq (logand (point-max) 1023) 1)
+  (and (> (point-max) 1)
+       (eq (logand (point-max) 1023) 1)
        (save-excursion
 	 (forth-beginning)
 	 (not (search-forward "\n" 1024 t)))))
