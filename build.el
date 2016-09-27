@@ -1,0 +1,6 @@
+(let ((generated-autoload-file (concat default-directory "autoloads.el")))
+  (update-directory-autoloads "."))
+(load-file "autoloads.el")
+(add-to-list 'load-path ".")
+(let ((result (byte-recompile-directory "." 0)))
+  (kill-emacs (if (string-match "failed" result) 1 0)))
