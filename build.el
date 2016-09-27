@@ -1,3 +1,4 @@
+(princ (emacs-version))
 (let ((generated-autoload-file (concat default-directory "autoloads.el")))
   (update-directory-autoloads "."))
 (load-file "autoloads.el")
