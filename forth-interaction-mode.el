@@ -84,7 +84,8 @@
 
 ;;;###autoload
 (defun forth-words ()
-  (split-string (forth-interaction-send "words")))
+  (when forth-interaction-buffer
+    (split-string (forth-interaction-send "words"))))
 
 ;;;###autoload
 (defun forth-eval-region (start end)

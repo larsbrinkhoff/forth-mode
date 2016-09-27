@@ -69,8 +69,12 @@
     (1- (point))))
 
 (defun forth-expand-symbol ()
-  ;; Append result from (imenu--make-index-alist t)?
-  (list (forth-symbol-start) (forth-symbol-end) (forth-words)))
+  (let ((list (forth-words)))
+    (dolist (index (imenu--make-index-alist t))
+      (when (listp (rest index))
+	(dolist (def (rest index))
+	  (push (car def) list))))
+    (list (forth-symbol-start) (forth-symbol-end) list)))
 
 (defun forth-block-p ()
   "Guess whether the current buffer is a Forth block file."
