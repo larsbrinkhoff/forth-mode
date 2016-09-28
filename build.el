@@ -5,7 +5,15 @@
 (load-file "autoloads.el")
 (add-to-list 'load-path ".")
 
-(require 'ert)
+(if (locate-library "ert")
+    (require 'ert)
+  (defmacro ert-deftest (name args &rest body)
+    `(progn ,@body))
+  (defun ert-run-tests-batch-and-exit ()
+    (kill-emacs 0))
+  (defun should (arg))
+  (defun should-not (arg)))
+
 (ert-deftest compile-package ()
   "Compile package."
   (should-not (string-match "failed" (byte-recompile-directory "." 0))))

@@ -1,5 +1,8 @@
+EMACS ?= emacs
+EMACS_LOAD = $(EMACS) -Q --batch --load
+
 all:
-	emacs -Q --batch --load build.el
+	$(EMACS_LOAD) build.el
 
 clean:
 	rm -f autoloads.el *.elc

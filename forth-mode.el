@@ -87,6 +87,10 @@
 (unless (fboundp 'prog-mode)
   (defalias 'prog-mode 'fundamental-mode))
 
+(unless (fboundp 'setq-local)
+  (defmacro setq-local (var val)
+    `(set (make-local-variable ',var) ,val)))
+
 ;;;###autoload
 (define-derived-mode forth-mode prog-mode "Forth"
 		     "Major mode for editing Forth files."
