@@ -1,6 +1,9 @@
 language: emacs-lisp
 sudo: required
-#install: sh -e install-deps.sh
+env:
+  - EMACS=emacs23
+  - EMACS=emacs24
+install: sudo apt-get update -y && sudo apt-get install emacs23 emacs24
 script: make
 notifications:
   email: lars@nocrew.org
