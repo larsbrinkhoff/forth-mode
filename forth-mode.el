@@ -15,17 +15,15 @@
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-c C-r") #'forth-eval-region)
     (define-key map (kbd "C-c C-l") 'forth-load-file)
+    (define-key map (kbd "C-c C-s") #'forth-see)
     ;; (define-key map (kbd "C-M-x") #'forth-eval-defun)
     ;; (define-key map (kbd "C-c C-c") 'eval-buffer)
     ;; (define-key map (kbd "C-x C-e") #'forth-eval-last-sexp)
-    ;; (define-key map (kbd "C-M-x") #'forth-eval-defun)
     ;; (define-key map (kbd "C-c :") #'forth-eval-expression)
     ;; (define-key map (kbd "C-x `") #'forth-next-error)
     ;; (define-key map (kbd "M-n") #'forth-next-note)
     ;; (define-key map (kbd "M-p") #'forth-previous-note)
-    ;; (define-key map (kbd "M-TAB") #'forth-complete-symbol)
     ;; (define-key map (kbd "M-.") #'forth-find-definition)
-    ;; (define-key map (kbd "C-c C-s") #'forth-see)
     ;; (define-key map (kbd "C-c C-z") #'forth-switch-to-output-buffer)
     map))
 
@@ -67,6 +65,9 @@
   (save-excursion
     (re-search-forward "[^[:graph:]]")
     (1- (point))))
+
+(defun forth-word-at-point ()
+  (buffer-substring (forth-symbol-start) (forth-symbol-end)))
 
 (defun forth-expand-symbol ()
   (let ((list (forth-words)))
@@ -136,6 +137,14 @@
 (defun forth-load-file (file)
   (interactive (list (buffer-file-name (current-buffer))))
   (forth-interaction-send "include " file))
+
+(defun forth-see-word (word)
+  (interactive (list (forth-word-at-point)))
+  (let ((buffer (get-buffer-create "*see*")))
+    (pop-to-buffer-same-window buffer)
+    (erase-buffer)
+    (insert (forth-interaction-send "see " word))
+    (special-mode)))
 
 (defun forth-beginning ()
   (goto-char (point-min)))
