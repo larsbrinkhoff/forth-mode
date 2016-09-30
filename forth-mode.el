@@ -13,10 +13,10 @@
 
 (defvar forth-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-c C-r") #'forth-eval-region)
+    (define-key map (kbd "C-c C-r") 'forth-eval-region)
     (define-key map (kbd "C-c C-l") 'forth-load-file)
-    (define-key map (kbd "C-c C-s") #'forth-see)
-    ;; (define-key map (kbd "C-M-x") #'forth-eval-defun)
+    (define-key map (kbd "C-c C-s") 'forth-see)
+    (define-key map (kbd "C-M-x") 'forth-eval-defun)
     ;; (define-key map (kbd "C-c C-c") 'eval-buffer)
     ;; (define-key map (kbd "C-x C-e") #'forth-eval-last-sexp)
     ;; (define-key map (kbd "C-c :") #'forth-eval-expression)
@@ -145,6 +145,12 @@
     (erase-buffer)
     (insert (forth-interaction-send "see " word))
     (special-mode)))
+
+(defun forth-eval-defun ()
+  (interactive)
+  (save-excursion
+    (mark-defun)
+    (forth-eval-region (point) (mark))))
 
 (defun forth-beginning ()
   (goto-char (point-min)))
