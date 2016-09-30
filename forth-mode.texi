@@ -1,0 +1,42 @@
+\input texinfo
+@settitle Forth Mode
+
+@copying
+Copyright @copyright{} 2015 Lars Brinkhoff
+@end copying
+
+@dircategory Emacs editing modes
+@direntry
+* Forth mode: (forth-mode).  Emacs mode for editing Forth files.
+@end direntry
+
+@titlepage
+@title Forth Mode
+@subtitle An Emacs mode for editing Forth files
+@end titlepage
+
+@page
+@contents
+
+@node Top
+@top Forth Mode
+
+@menu
+* Overview::
+* Using Forth Mode::
+* Forth Interaction::
+@end menu
+
+@node Overview
+
+Programming language mode for Forth.
+
+@node Using Forth Mode
+
+How to use forth-mode.
+
+@node Forth Interaction
+
+How to interact with Forth.
+
+@bye
