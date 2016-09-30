@@ -70,10 +70,11 @@
 
 (defun forth-expand-symbol ()
   (let ((list (forth-words)))
-    (dolist (index (imenu--make-index-alist t))
-      (when (listp (rest index))
-	(dolist (def (rest index))
-	  (push (car def) list))))
+    (when (fboundp 'imenu--make-index-alist)
+      (dolist (index (imenu--make-index-alist t))
+	(when (listp (rest index))
+	  (dolist (def (rest index))
+	    (push (car def) list)))))
     (list (forth-symbol-start) (forth-symbol-end) list)))
 
 (defun forth-block-p ()
