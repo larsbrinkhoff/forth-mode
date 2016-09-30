@@ -25,7 +25,8 @@
 (defun forth-kill (&optional buffer)
   (interactive)
   (setq buffer (or buffer (current-buffer)))
-  (set-process-query-on-exit-flag (get-buffer-process buffer) nil)
+  (when (get-buffer-process buffer)
+    (set-process-query-on-exit-flag (get-buffer-process buffer) nil))
   (kill-buffer buffer)
   (setq forth-interaction-buffer nil))
 
