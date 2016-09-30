@@ -4,6 +4,6 @@ env:
   - EMACS=emacs23
   - EMACS=emacs24
 install: sudo apt-get update -y && sudo apt-get install emacs23 emacs24
-script: make
+script: make EMACS=$EMACS
 notifications:
   email: lars@nocrew.org

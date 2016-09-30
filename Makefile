@@ -1,4 +1,4 @@
-EMACS ?= emacs
+EMACS = emacs
 EMACS_LOAD = $(EMACS) -Q --batch --load
 
 all:
