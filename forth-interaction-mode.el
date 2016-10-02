@@ -3,6 +3,7 @@
 
 (defvar forth-interaction-buffer nil)
 (defvar forth-interaction-callback nil)
+(defvar forth-words-cache nil)
 
 (defvar forth-interaction-mode-map
   (let ((map (copy-keymap forth-mode-map)))
@@ -81,12 +82,15 @@
     (comint-send-string proc "\n")
     (while (< (float-time) end-time)
       (accept-process-output proc 0.1))
+    (setq forth-words-cache nil)
     forth-result))
 
 ;;;###autoload
 (defun forth-words ()
   (when forth-interaction-buffer
-    (split-string (forth-interaction-send "words"))))
+    (or forth-words-cache
+	(setq forth-words-cache
+	      (split-string (forth-interaction-send "words"))))))
 
 ;;;###autoload
 (defun forth-eval-region (start end)
