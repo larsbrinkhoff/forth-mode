@@ -17,6 +17,7 @@
     (define-key map (kbd "C-c C-l") 'forth-load-file)
     (define-key map (kbd "C-c C-s") 'forth-see)
     (define-key map (kbd "C-M-x") 'forth-eval-defun)
+    (define-key map (kbd "C-c C-k") 'forth-kill)
     ;; (define-key map (kbd "C-c C-c") 'eval-buffer)
     ;; (define-key map (kbd "C-x C-e") #'forth-eval-last-sexp)
     ;; (define-key map (kbd "C-c :") #'forth-eval-expression)

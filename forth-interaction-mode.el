@@ -7,7 +7,6 @@
 (defvar forth-interaction-mode-map
   (let ((map (copy-keymap forth-mode-map)))
     (set-keymap-parent map comint-mode-map)
-    (define-key map (kbd "C-c C-k") 'forth-kill)
     (define-key map (kbd "C-c C-r") 'forth-restart)
     map)
   "Keymap for Forth interaction.")
@@ -22,9 +21,10 @@
       (funcall forth-interaction-callback text)
       text))
 
+;;;###autoload
 (defun forth-kill (&optional buffer)
   (interactive)
-  (setq buffer (or buffer (current-buffer)))
+  (setq buffer (or buffer forth-interaction-buffer))
   (when (get-buffer-process buffer)
     (set-process-query-on-exit-flag (get-buffer-process buffer) nil))
   (kill-buffer buffer)
