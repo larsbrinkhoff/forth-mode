@@ -69,6 +69,14 @@
     (run-forth))
   (get-buffer-process forth-interaction-buffer))
 
+(defun forth-scrub (string)
+  "Remove terminal escape sequences from STRING."
+  (let ((n 0))
+    (while (setq n (string-match "[?[0-9;]*[a-z]" string n))
+      (message "n = %d" n)
+      (setq string (replace-match "" t t string))))
+  string)
+
 ;;;###autoload
 (defun forth-interaction-send (&rest strings)
   (let* ((proc (forth-ensure))
@@ -83,7 +91,7 @@
     (while (< (float-time) end-time)
       (accept-process-output proc 0.1))
     (setq forth-words-cache nil)
-    forth-result))
+    (forth-scrub forth-result)))
 
 ;;;###autoload
 (defun forth-words ()
