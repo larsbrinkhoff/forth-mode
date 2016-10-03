@@ -47,7 +47,7 @@
     (setq forth-executable
 	  (read-string "Forth executable: ")))
   (let ((buffer (get-buffer-create "*forth*")))
-    (pop-to-buffer-same-window buffer)
+    (pop-to-buffer buffer)
     (unless (comint-check-proc buffer)
       (run-hooks 'run-forth-hooks)
       (make-comint-in-buffer "forth" buffer forth-executable)

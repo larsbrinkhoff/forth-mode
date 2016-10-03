@@ -156,7 +156,7 @@
 (defun forth-see-word (word)
   (interactive (list (forth-word-at-point)))
   (let ((buffer (get-buffer-create "*see*")))
-    (pop-to-buffer-same-window buffer)
+    (pop-to-buffer buffer)
     (erase-buffer)
     (insert (forth-interaction-send "see " word))
     (special-mode)))
