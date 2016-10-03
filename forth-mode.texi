@@ -21,6 +21,10 @@ Copyright @copyright{} 2015 Lars Brinkhoff
 @node Top
 @top Forth Mode
 
+Forth Mode is a programming language mode for Forth.  It can be used
+to edit regular Forth files, and block files.  There is also a host of
+commands for interacting with a running Forth session.
+
 @menu
 * Overview::
 * Using Forth Mode::
@@ -35,8 +39,95 @@ Programming language mode for Forth.
 
 How to use forth-mode.
 
+Key bindings:
+
+@table @kbd
+
+@item M-TAB
+@itemx C-M-i
+@itemx M-x completion-at-point
+
+Attempt to complete the Forth word under point.
+
+@item C-M-f
+@itemx M-x forward-sexp
+
+Move forward across one balanced expression.
+
+@item C-M-b
+@itemx M-x backward-sexp
+
+Move backward across one balanced expression.
+
+@end table
+
 @node Forth Interaction
 
 How to interact with Forth.
+
+Key bindings:
+
+@table @kbd
+
+@item M-x run-forth
+
+Start an interactive Forth session.
+
+@item C-c C-z
+@itemx M-x forth-switch-to-output-buffer
+
+Switch to the interactive Forth session.
+
+@item C-c C-r
+@itemx M-x forth-restart
+
+Restart the interactive Forth session.
+
+@item C-c C-k
+@itemx M-x forth-kill
+
+End the interactive Forth session.
+
+@item C-c :
+@itemx M-x forth-eval
+
+Enter a string to evalutaion.  The output, if any, is printed in the
+minibuffer.
+
+@item C-c C-r
+@itemx M-x forth-eval-region
+
+Evalutate the current region.  The output, if any, is printed in the
+minibuffer.
+
+@item C-c C-e
+@itemx M-x forth-eval-last-expression
+
+Evaluate the expression before point.  The output, if any, is printed
+in the minibuffer.
+
+@item C-x M-e
+@itemx M-x forth-eval-last-expression-display-output
+
+Evaluate the expression before point.  Display the output, if any, in
+the interactive Forth session.
+
+@item C-M-x
+@itemx M-x forth-eval-defun
+
+Evalutate the colon definition under point.  The output, if any, is
+printed in the minibuffer.
+
+@item C-c C-l
+@itemx M-x forth-load-file
+
+Load the current file into the interactive Forth Session.
+
+@item C-c C-s
+@itemx M-x forth-see
+
+Display a human-readable representation of the word under point.
+
+@end table
 
 @bye
