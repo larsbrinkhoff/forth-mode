@@ -9,7 +9,7 @@
     (require 'ert)
   (defmacro ert-deftest (name args &rest body)
     `(progn ,@body))
-  (defun ert-run-tests-batch-and-exit ()
+  (defun ert-run-tests-batch-and-exit (&optional x)
     (kill-emacs 0))
   (defun should (arg))
   (defun should-not (arg)))
