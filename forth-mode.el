@@ -79,13 +79,27 @@
 	    (push (car def) list)))))
     (list (forth-symbol-start) (forth-symbol-end) list)))
 
+(defun forth-block-with-newlines-p ()
+  (save-excursion
+    (forth-beginning)
+    (let ((result t))
+      (dotimes (i 16)
+	(goto-char (* 64 (1+ i)))
+	(unless (looking-at "\n")
+	  (setq result nil)))
+      result)))
+
+(defun forth-block-without-newlines-p ()
+  (save-excursion
+    (forth-beginning)
+    (not (search-forward "\n" 1024 t))))
+
 (defun forth-block-p ()
   "Guess whether the current buffer is a Forth block file."
   (and (> (point-max) 1)
        (eq (logand (point-max) 1023) 1)
-       (save-excursion
-	 (forth-beginning)
-	 (not (search-forward "\n" 1024 t)))))
+       (or (forth-block-with-newlines-p)
+	   (forth-block-without-newlines-p))))
 
 (unless (fboundp 'prog-mode)
   (defalias 'prog-mode 'fundamental-mode))

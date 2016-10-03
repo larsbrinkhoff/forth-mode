@@ -1,6 +1,8 @@
 (require 'cl)
 (require 'forth-mode)
 
+(defvar forth-block-with-newlines)
+
 (defun forth-line (n)
   (goto-char (point-min))
   (forward-line (1- n)))
@@ -80,6 +82,8 @@
 (define-minor-mode forth-block-mode
   "Minor mode for Forth code in blocks."
   :lighter " block"
+  (make-local-variable 'forth-block-with-newlines)
+  (setq forth-block-with-newlines (forth-block-with-newlines-p))
   (setq require-final-newline nil)
   (forth-unblockify)
   (add-hook 'before-save-hook 'forth-blockify nil t)
