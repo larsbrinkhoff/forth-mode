@@ -118,12 +118,13 @@
   (forth-interaction-send "include " file))
 
 ;;;###autoload
-(defun forth-see-word (word)
+(defun forth-see (word)
   (interactive (list (forth-word-at-point)))
   (let ((buffer (get-buffer-create "*see*")))
     (pop-to-buffer buffer)
-    (erase-buffer)
-    (insert (forth-interaction-send "see " word))
+    (let ((inhibit-read-only t))
+      (erase-buffer)
+      (insert (forth-interaction-send "see " word)))
     (special-mode)))
 
 (provide 'forth-interaction-mode)
