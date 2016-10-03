@@ -11,6 +11,8 @@
 
 ;;; Code:
 
+(require 'cl)
+
 (defvar forth-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-c C-r") 'forth-eval-region)
@@ -148,24 +150,6 @@
 (defun forth-match-definition (limit)
   (search-forward-regexp "\\(^\\|\\s-\\)\\(\\S-*:\\|code\\|defer\\|2?variable\\|create\\|2?value\\|2?constant\\)\\s-+\\([[:graph:]]+\\)"
 			 limit t))
-
-(defun forth-load-file (file)
-  (interactive (list (buffer-file-name (current-buffer))))
-  (forth-interaction-send "include " file))
-
-(defun forth-see-word (word)
-  (interactive (list (forth-word-at-point)))
-  (let ((buffer (get-buffer-create "*see*")))
-    (pop-to-buffer buffer)
-    (erase-buffer)
-    (insert (forth-interaction-send "see " word))
-    (special-mode)))
-
-(defun forth-eval-defun ()
-  (interactive)
-  (save-excursion
-    (mark-defun)
-    (forth-eval-region (point) (mark))))
 
 (defun forth-beginning ()
   (goto-char (point-min)))

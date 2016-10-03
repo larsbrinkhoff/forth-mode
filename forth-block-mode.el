@@ -1,4 +1,3 @@
-(require 'cl)
 (require 'forth-mode)
 
 (defvar forth-block-with-newlines)

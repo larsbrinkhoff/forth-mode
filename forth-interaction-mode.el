@@ -105,4 +105,25 @@
   (interactive "r")
   (message "%s" (forth-interaction-send (buffer-substring start end))))
 
+;;;###autoload
+(defun forth-eval-defun ()
+  (interactive)
+  (save-excursion
+    (mark-defun)
+    (forth-eval-region (point) (mark))))
+
+;;;###autoload
+(defun forth-load-file (file)
+  (interactive (list (buffer-file-name (current-buffer))))
+  (forth-interaction-send "include " file))
+
+;;;###autoload
+(defun forth-see-word (word)
+  (interactive (list (forth-word-at-point)))
+  (let ((buffer (get-buffer-create "*see*")))
+    (pop-to-buffer buffer)
+    (erase-buffer)
+    (insert (forth-interaction-send "see " word))
+    (special-mode)))
+
 (provide 'forth-interaction-mode)
