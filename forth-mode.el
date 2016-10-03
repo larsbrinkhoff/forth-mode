@@ -20,14 +20,15 @@
     (define-key map (kbd "C-c C-s") 'forth-see)
     (define-key map (kbd "C-M-x") 'forth-eval-defun)
     (define-key map (kbd "C-c C-k") 'forth-kill)
+    (define-key map (kbd "C-c C-e") 'forth-eval-last-expression)
+    (define-key map (kbd "C-x M-e") 'forth-eval-last-expression-display-output)
+    (define-key map (kbd "C-c C-z") 'forth-switch-to-output-buffer)
+    (define-key map (kbd "C-c :") 'forth-eval)
     ;; (define-key map (kbd "C-c C-c") 'eval-buffer)
-    ;; (define-key map (kbd "C-x C-e") #'forth-eval-last-sexp)
-    ;; (define-key map (kbd "C-c :") #'forth-eval-expression)
     ;; (define-key map (kbd "C-x `") #'forth-next-error)
     ;; (define-key map (kbd "M-n") #'forth-next-note)
     ;; (define-key map (kbd "M-p") #'forth-previous-note)
     ;; (define-key map (kbd "M-.") #'forth-find-definition)
-    ;; (define-key map (kbd "C-c C-z") #'forth-switch-to-output-buffer)
     map))
 
 (defvar forth-mode-syntax-table

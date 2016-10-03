@@ -104,9 +104,14 @@
 	      (split-string (forth-interaction-send "words"))))))
 
 ;;;###autoload
+(defun forth-eval (string)
+  (interactive "sForth expression: ")
+  (message "%s" (forth-interaction-send string)))
+
+;;;###autoload
 (defun forth-eval-region (start end)
   (interactive "r")
-  (message "%s" (forth-interaction-send (buffer-substring start end))))
+  (forth-eval (buffer-substring start end)))
 
 ;;;###autoload
 (defun forth-eval-defun ()
@@ -129,5 +134,34 @@
       (erase-buffer)
       (insert (forth-interaction-send "see " word)))
     (special-mode)))
+
+;;;###autoload
+(defun forth-switch-to-output-buffer ()
+  (interactive)
+  (if forth-interaction-buffer
+      (switch-to-buffer forth-interaction-buffer)
+      (message "Forth not started.")))
+
+;;;###autoload
+(defun forth-eval-last-expression ()
+  (interactive)
+  (save-excursion
+    (backward-sexp)
+    (let ((start (point)))
+      (forward-sexp)
+      (forth-eval-region start (point)))))
+
+;;;###autoload
+(defun forth-eval-last-expression-display-output ()
+  (interactive)
+  (if forth-interaction-buffer
+      (save-excursion
+	(backward-sexp)
+	(let ((start (point)))
+	  (forward-sexp)
+	  (let ((string (buffer-substring start (point))))
+	    (forth-switch-to-output-buffer)
+	    (insert (forth-interaction-send string)))))
+      (message "Forth not started.")))
 
 (provide 'forth-interaction-mode)
