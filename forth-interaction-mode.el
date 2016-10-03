@@ -75,7 +75,10 @@
     (while (setq n (string-match "[?[0-9;]*[a-z]" string n))
       (message "n = %d" n)
       (setq string (replace-match "" t t string))))
-  string)
+  (setq string (replace-regexp-in-string "\\`[[:space:]\n]*" "" string))
+  (setq string (replace-regexp-in-string "[[:space:]\n]*\\'" "" string))
+  (setq string (replace-regexp-in-string "ok\\'" "" string))
+  (setq string (replace-regexp-in-string "[[:space:]\n]*\\'" "" string)))
 
 ;;;###autoload
 (defun forth-interaction-send (&rest strings)
