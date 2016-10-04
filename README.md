@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/larsbrinkhoff/forth-mode.svg)]
 (https://travis-ci.org/larsbrinkhoff/forth-mode)
+[![Build Status](https://app.wercker.com/status/4462b6415a66ffb9eb177d65fb392058/s/master)]
+(https://app.wercker.com/project/byKey/4462b6415a66ffb9eb177d65fb392058)
 [![MELPA](https://melpa.org/packages/forth-mode-badge.svg)]
 (https://melpa.org/#/forth-mode)
 
