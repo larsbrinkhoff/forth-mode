@@ -51,6 +51,8 @@
     (unless (comint-check-proc buffer)
       (run-hooks 'run-forth-hooks)
       (make-comint-in-buffer "forth" buffer forth-executable)
+      (set-process-window-size (get-buffer-process buffer)
+			       (window-width) (window-height))
       (set-process-sentinel (get-buffer-process buffer)
 			    'forth-interaction-sentinel)
       (forth-interaction-mode)
