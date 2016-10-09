@@ -4,6 +4,15 @@
 (defvar forth-interaction-buffer nil)
 (defvar forth-interaction-callback nil)
 (defvar forth-words-cache nil)
+(defvar forth-implementation nil)
+
+(defvar forth-implementation-matches
+  '(("Gforth" . gforth)
+    ("SP-FORTH" . spforth)
+    ("PForth" . pforth)
+    ("VFX Forth" . vfxforth)
+    ("SwiftForth" . swiftforth)
+    ("lbForth" . lbforth)))
 
 (defvar forth-interaction-mode-map
   (let ((map (copy-keymap forth-mode-map)))
@@ -18,6 +27,10 @@
   (use-local-map forth-interaction-mode-map))
 
 (defun forth-interaction-preoutput-filter (text)
+  (unless forth-implementation
+    (dolist (x forth-implementation-matches)
+      (when (string-match (car x) text)
+	(setq forth-implementation (cdr x)))))
   (if forth-interaction-callback
       (funcall forth-interaction-callback text)
       text))
