@@ -7,6 +7,7 @@
 (defvar forth-interaction-callback nil)
 (defvar forth-words-cache nil)
 (defvar forth-implementation nil)
+(defvar forth-introspection-p nil)
 (defvar forth-banner "")
 (defvar forth-backend-dir
   (concat (file-name-directory load-file-name) "backend"))
@@ -137,15 +138,26 @@
 	(setq forth-words-cache
 	      (split-string (forth-interaction-send "words"))))))
 
+(declare-function forth-introspect "backend/lbforth.el")
+
 ;;;###autoload
-(defun forth-eval (string)
+(defun forth-eval (string &optional buffer start)
   (interactive "sForth expression: ")
-  (message "%s" (forth-interaction-send string)))
+  (when (and forth-introspection-p buffer)
+    (setq string (concat "start-introspection\n"
+			 string
+			 "\nstop-introspection")))
+  (let ((result (forth-interaction-send string)))
+    (when (and forth-introspection-p buffer)
+      (let ((list (split-string result "\n")))
+	(setq result (mapconcat #'identity (butlast list) "\n"))
+	(forth-introspect (car (last list)) buffer start)))
+    (message "%s" result)))
 
 ;;;###autoload
 (defun forth-eval-region (start end)
   (interactive "r")
-  (forth-eval (buffer-substring start end)))
+  (forth-eval (buffer-substring start end) (current-buffer) start))
 
 ;;;###autoload
 (defun forth-eval-defun ()
