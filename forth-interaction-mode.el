@@ -5,6 +5,8 @@
 (defvar forth-interaction-callback nil)
 (defvar forth-words-cache nil)
 (defvar forth-implementation nil)
+(defvar forth-banner "")
+(defvar forth-backend-dir (concat default-directory "backend"))
 
 (defvar forth-implementation-matches
   '(("Gforth" . gforth)
@@ -28,9 +30,11 @@
 
 (defun forth-interaction-preoutput-filter (text)
   (unless forth-implementation
+    (setq forth-banner (concat forth-banner text))
     (dolist (x forth-implementation-matches)
-      (when (string-match (car x) text)
-	(setq forth-implementation (cdr x)))))
+      (when (string-match (car x) forth-banner)
+	(let ((load-path (cons forth-backend-dir load-path)))
+	  (require (setq forth-implementation (cdr x)))))))
   (if forth-interaction-callback
       (funcall forth-interaction-callback text)
       text))
@@ -56,6 +60,8 @@
 (defun run-forth ()
   "Start an interactive forth session."
   (interactive)
+  (setq forth-implementation nil)
+  (setq forth-banner "")
   (unless forth-executable
     (setq forth-executable
 	  (read-string "Forth executable: ")))
