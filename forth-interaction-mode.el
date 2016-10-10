@@ -6,7 +6,8 @@
 (defvar forth-words-cache nil)
 (defvar forth-implementation nil)
 (defvar forth-banner "")
-(defvar forth-backend-dir (concat default-directory "backend"))
+(defvar forth-backend-dir
+  (concat (file-name-directory load-file-name) "backend"))
 
 (defvar forth-implementation-matches
   '(("Gforth" . gforth)
