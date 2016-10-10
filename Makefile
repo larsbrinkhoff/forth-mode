@@ -12,4 +12,4 @@ doc: forth-mode.info
 	makeinfo $<
 
 clean:
-	rm -f autoloads.el *.elc
+	rm -f autoloads.el *.elc backend/*.elc

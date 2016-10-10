@@ -1,7 +1,7 @@
 (princ (emacs-version))
 
 (let ((generated-autoload-file (concat default-directory "autoloads.el")))
-  (update-directory-autoloads "."))
+  (update-directory-autoloads "." "./backend"))
 (load-file "autoloads.el")
 (add-to-list 'load-path default-directory)
 
