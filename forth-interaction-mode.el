@@ -94,7 +94,6 @@
   "Remove terminal escape sequences from STRING."
   (let ((n 0))
     (while (setq n (string-match "[?[0-9;]*[a-z]" string n))
-      (message "n = %d" n)
       (setq string (replace-match "" t t string))))
   (setq string (replace-regexp-in-string "\\`[[:space:]\n]*" "" string))
   (setq string (replace-regexp-in-string "[[:space:]\n]*\\'" "" string))
