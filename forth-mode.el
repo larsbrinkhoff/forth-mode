@@ -11,6 +11,7 @@
 
 ;;; Code:
 
+(eval-when-compile (byte-compile-disable-warning 'cl-functions))
 (require 'cl)
 (require 'forth-smie)
 
