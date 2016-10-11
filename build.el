@@ -11,8 +11,11 @@
     `(progn ,@body))
   (defun ert-run-tests-batch-and-exit (&optional x)
     (kill-emacs 0))
-  (defun should (arg))
-  (defun should-not (arg)))
+  (defun should (arg)
+    (unless arg
+      (kill-emacs 1)))
+  (defun should-not (arg)
+    (should (not arg))))
 
 (ert-deftest compile-package ()
   "Compile package."
