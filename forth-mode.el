@@ -164,8 +164,8 @@
   (defmacro with-eval-after-load (lib &rest forms)
     `(eval-after-load ,lib '(progn ,@forms))))
 
-(eval-after-load "speedbar"
-  '(progn
+(with-eval-after-load "speedbar"
+  (when (fboundp 'speedbar-add-supported-extension)
     (speedbar-add-supported-extension ".f")
     (speedbar-add-supported-extension ".fs")
     (speedbar-add-supported-extension ".fth")
