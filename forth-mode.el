@@ -141,7 +141,8 @@
       (forth-block-mode))
   (setq font-lock-defaults '(forth-font-lock-keywords))
   (setq-local completion-at-point-functions '(forth-expand-symbol))
-  (setq-local syntax-propertize-function #'forth--syntax-propertize)
+  (when (boundp 'syntax-propertize-function)
+    (setq-local syntax-propertize-function #'forth--syntax-propertize))
   (setq-local parse-sexp-lookup-properties t)
   (forth-smie-setup)
   (setq ;; font-lock-defaults

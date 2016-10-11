@@ -22,6 +22,10 @@
 
 (defvar forth-smie--basic-indent 2)
 
+(unless (fboundp 'pcase)
+  (defmacro pcase (form &rest forms)
+    0))
+
 (defun forth-smie--indentation-rules (kind token)
   (pcase (cons kind token)
     (`(:elem . basic) forth-smie--basic-indent)
