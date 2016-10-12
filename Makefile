@@ -1,9 +1,11 @@
 EMACS = emacs
 EMACS_LOAD = $(EMACS) -Q --batch --load
 
+SRC = $(wildcard *.el) $(wildcard backend/*.el)
+
 all: forth-mode.elc
 
-forth-mode.elc: $(wildcard *.el)
+forth-mode.elc: $(SRC)
 	$(EMACS_LOAD) build.el
 
 doc: forth-mode.info
