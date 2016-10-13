@@ -1,3 +1,5 @@
+(eval-when-compile (byte-compile-disable-warning 'cl-functions))
+
 (require 'comint)
 (require 'forth-mode)
 
@@ -91,18 +93,19 @@
     (run-forth))
   (get-buffer-process forth-interaction-buffer))
 
-(defun forth-scrub (string)
+(defun forth-scrub (string &optional keep-ok)
   "Remove terminal escape sequences from STRING."
   (let ((n 0))
     (while (setq n (string-match "[?[0-9;]*[a-z]" string n))
       (setq string (replace-match "" t t string))))
   (setq string (replace-regexp-in-string "\\`[[:space:]\n]*" "" string))
   (setq string (replace-regexp-in-string "[[:space:]\n]*\\'" "" string))
-  (setq string (replace-regexp-in-string "ok\\'" "" string))
-  (setq string (replace-regexp-in-string "[[:space:]\n]*\\'" "" string)))
+  (if keep-ok
+      string
+    (setq string (replace-regexp-in-string "ok\\'" "" string))
+    (setq string (replace-regexp-in-string "[[:space:]\n]*\\'" "" string))))
 
-;;;###autoload
-(defun forth-interaction-send (&rest strings)
+(defun forth-interaction-send-raw-result (&rest strings)
   (let* ((proc (forth-ensure))
 	 (forth-result nil)
 	 (forth-interaction-callback (lambda (x)
@@ -115,7 +118,11 @@
     (while (< (float-time) end-time)
       (accept-process-output proc 0.1))
     (setq forth-words-cache nil)
-    (forth-scrub forth-result)))
+    forth-result))
+
+;;;###autoload
+(defun forth-interaction-send (&rest strings)
+  (forth-scrub (apply #'forth-interaction-send-raw-result strings)))
 
 ;;;###autoload
 (defun forth-words ()
@@ -144,7 +151,15 @@
 ;;;###autoload
 (defun forth-load-file (file)
   (interactive (list (buffer-file-name (current-buffer))))
-  (forth-interaction-send "include " file))
+  (let ((result (forth-interaction-send-raw-result "include " file)))
+    (setq result (forth-scrub result t))
+    (if (< (count ?\n result) 2)
+	(message "%s" result)
+      (let ((buffer (current-buffer)))
+	(pop-to-buffer forth-interaction-buffer)
+	(goto-char (point-max))
+	(insert result "\n")
+	(pop-to-buffer buffer)))))
 
 ;;;###autoload
 (defun forth-see (word)
