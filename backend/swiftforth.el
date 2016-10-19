@@ -1,12 +1,11 @@
 (require 'forth-interaction-mode)
 
-(set-process-coding-system (get-buffer-process forth-interaction-buffer)
-			   'raw-text-dos 'raw-text-dos)
-(save-excursion
-  (with-current-buffer forth-interaction-buffer
-    (goto-char (point-max))
-    (insert "\n")))
+(defun forth-swiftforth-init (backend-type process)
+  (when (eq backend-type 'swiftforth)
+    (set-process-coding-system process 'raw-text-dos 'raw-text-dos)
+    (forth-interaction-send (concat "include " forth-backend-dir
+				    "/swiftforth.fth\n"))))
 
-(forth-interaction-send (concat "include " forth-backend-dir "/swiftforth.fth"))
+(add-hook 'forth-interaction-init-backend-hook #'forth-swiftforth-init)
 
 (provide 'swiftforth)
