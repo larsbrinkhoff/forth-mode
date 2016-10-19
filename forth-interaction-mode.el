@@ -155,11 +155,9 @@
     (setq result (forth-scrub result t))
     (if (< (count ?\n result) 2)
 	(message "%s" result)
-      (let ((buffer (current-buffer)))
-	(pop-to-buffer forth-interaction-buffer)
-	(goto-char (point-max))
-	(insert result "\n")
-	(pop-to-buffer buffer)))))
+      (pop-to-buffer forth-interaction-buffer))
+    (comint-output-filter (get-buffer-process forth-interaction-buffer)
+			  (concat result "\n"))))
 
 ;;;###autoload
 (defun forth-see (word)
