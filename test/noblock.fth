@@ -1,1 +1,1 @@
-: foo ;
+: foo" ( -- ) s" bar" type ;
