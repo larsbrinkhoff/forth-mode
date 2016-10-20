@@ -4,7 +4,7 @@
   (when (eq backend-type 'swiftforth)
     (set-process-coding-system process 'raw-text-dos 'raw-text-dos)
     (forth-interaction-send (concat "include " forth-backend-dir
-				    "/swiftforth.fth\n"))))
+				    "/swiftforth.fth"))))
 
 (add-hook 'forth-interaction-init-backend-hook #'forth-swiftforth-init)
 
