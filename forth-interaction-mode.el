@@ -31,13 +31,19 @@
   :syntax-table forth-mode-syntax-table
   (use-local-map forth-interaction-mode-map))
 
+(defvar forth-interaction-init-backend-hook '())
+
 (defun forth-interaction-preoutput-filter (text)
   (unless forth-implementation
     (setq forth-banner (concat forth-banner text))
     (dolist (x forth-implementation-matches)
       (when (string-match (car x) forth-banner)
+	(setq forth-implementation (cdr x))
 	(let ((load-path (cons forth-backend-dir load-path)))
-	  (require (setq forth-implementation (cdr x)))))))
+	  (require forth-implementation))
+	(run-hook-with-args 'forth-interaction-init-backend-hook
+			    forth-implementation
+			    (get-buffer-process (current-buffer))))))
   (if forth-interaction-callback
       (funcall forth-interaction-callback text)
       text))
