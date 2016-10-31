@@ -59,7 +59,7 @@
 
 (defun forth-interaction-sentinel (proc arg)
   (message "Forth: %s" arg)
-  (forth-kill (process-buffer proc)))
+  (comint-output-filter proc (format "\nForth: %s\n" arg)))
 
 (defvar forth-executable nil)
 
