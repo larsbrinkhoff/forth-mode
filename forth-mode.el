@@ -87,14 +87,16 @@
 		 (not (forth--ppss-in-comment-p (1- (point)))))
 	(cond ((save-excursion
 		 (goto-char (1- (point)))
-		 (not (looking-at "\\([ \n]\\|\\\`\\)\\((\\|\\\\\\)[ \n]")))
+		 (not (looking-at
+		       "\\([ \n\t]\\|\\\`\\)\\((\\|\\\\\\)[ \n\t]")))
 	       (put-text-property (point) (forth-symbol-end)
 				  'syntax-table (string-to-syntax "_")))
 	      ((and (looking-at "(")
 		    (re-search-forward ")" nil t))
-	       (put-text-property (point) (1+ (point))
+	       (put-text-property (1- (point)) (point)
 				  'syntax-table (string-to-syntax "!")))))
-      (forward-char))))
+      (unless (eobp)
+	(forward-char)))))
 
 (defun forth-expand-symbol ()
   (let ((list (forth-words)))
