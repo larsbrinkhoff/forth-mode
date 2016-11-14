@@ -13,6 +13,7 @@
 
 (eval-when-compile (byte-compile-disable-warning 'cl-functions))
 (require 'cl)
+(require 'forth-syntax)
 (require 'forth-smie)
 
 (defvar forth-mode-map
@@ -36,12 +37,12 @@
 (defvar forth-mode-syntax-table
   (let ((table (make-syntax-table)))
     (modify-syntax-entry ?\\ "<" table)
-    (modify-syntax-entry ?\n ">" table)
+    (modify-syntax-entry ?\n " " table)
     (modify-syntax-entry ?\( "!" table)
     (modify-syntax-entry ?\) "_" table)
     (modify-syntax-entry ?* "_23n" table)
-    (modify-syntax-entry ?\{ "<" table)
-    (modify-syntax-entry ?\} ">" table)
+    (modify-syntax-entry ?\{ "_" table)
+    (modify-syntax-entry ?\} "_" table)
     (modify-syntax-entry ?\: "(" table)
     (modify-syntax-entry ?\; ")" table)
     (modify-syntax-entry ?\[ "_" table)
@@ -74,29 +75,6 @@
 
 (defun forth-word-at-point ()
   (buffer-substring (forth-symbol-start) (forth-symbol-end)))
-
-(defun forth--ppss-in-comment-p (pos)
-  (not (null (elt (syntax-ppss pos) 4))))
-
-(defun forth--syntax-propertize (start end)
-  (save-excursion
-    (goto-char start)
-    ;; Fix some cases of comment syntax
-    (while (re-search-forward "(\\|\\\\" end t)
-      (when (and (forth--ppss-in-comment-p (point))
-		 (not (forth--ppss-in-comment-p (1- (point)))))
-	(cond ((save-excursion
-		 (goto-char (1- (point)))
-		 (not (looking-at
-		       "\\([ \n\t]\\|\\\`\\)\\((\\|\\\\\\)[ \n\t]")))
-	       (put-text-property (point) (forth-symbol-end)
-				  'syntax-table (string-to-syntax "_")))
-	      ((and (looking-at "(")
-		    (re-search-forward ")" nil t))
-	       (put-text-property (1- (point)) (point)
-				  'syntax-table (string-to-syntax "!")))))
-      (unless (eobp)
-	(forward-char)))))
 
 (defun forth-expand-symbol ()
   (let ((list (forth-words)))
@@ -145,7 +123,7 @@
   (setq font-lock-defaults '(forth-font-lock-keywords))
   (setq-local completion-at-point-functions '(forth-expand-symbol))
   (when (boundp 'syntax-propertize-function)
-    (setq-local syntax-propertize-function #'forth--syntax-propertize))
+    (setq-local syntax-propertize-function #'forth-syntax-propertize))
   (setq-local parse-sexp-lookup-properties t)
   (forth-smie-setup)
   (setq ;; font-lock-defaults
