@@ -17,7 +17,8 @@
        ("do" words "loop")
        ("do" words "+loop")
        ("begin-structure" words "end-structure")
-       ("{:" words ":}"))
+       ("{:" words ":}")
+       (":" words ";"))
       (words)))))
 
 (defvar forth-smie--basic-indent 2)
