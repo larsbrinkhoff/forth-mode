@@ -24,9 +24,10 @@
      ,@body))
 
 (defun forth-assert-face (content pos face)
-  (forth-with-temp-buffer content
-    (font-lock-fontify-buffer)
-    (should (eq face (get-text-property pos 'face)))))
+  (when (boundp 'syntax-propertize-function)
+    (forth-with-temp-buffer content
+      (font-lock-fontify-buffer)
+      (should (eq face (get-text-property pos 'face))))))
 
 (defun forth-strip-| (string)
   (replace-regexp-in-string "^[ \t]*|" "" (substring-no-properties  string)))
