@@ -9,7 +9,7 @@
 (if (locate-library "ert")
     (require 'ert)
   (defmacro ert-deftest (name args &rest body)
-    `(progn ,@body))
+    `(progn (message "Testing: %s" ',name) ,@body))
   (defun ert-run-tests-batch-and-exit (&optional x)
     (kill-emacs 0))
   (defun should (arg)
