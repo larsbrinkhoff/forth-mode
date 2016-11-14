@@ -24,9 +24,10 @@
      ,@body))
 
 (defun forth-assert-face (content pos face)
-  (forth-with-temp-buffer content
-    (font-lock-fontify-buffer)
-    (should (eq face (get-text-property pos 'face)))))
+  (when (boundp 'syntax-propertize-function)
+    (forth-with-temp-buffer content
+      (font-lock-fontify-buffer)
+      (should (eq face (get-text-property pos 'face))))))
 
 (ert-deftest forth-paren-comment-font-lock ()
   (forth-assert-face "( )" 1 font-lock-comment-delimiter-face)
