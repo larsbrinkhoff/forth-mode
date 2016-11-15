@@ -50,6 +50,12 @@ The whitespace before and including \"|\" on each line is removed."
 	(should (string= (forth-strip-| expected)
 			 (substring-no-properties (buffer-string))))))))
 
+(defun forth-assert-forward-sexp (content start end)
+  (forth-with-temp-buffer content
+    (goto-char start)
+    (forward-sexp)
+    (should (= (point) end))))
+
 (ert-deftest forth-paren-comment-font-lock ()
   (forth-assert-face "( )" 1 font-lock-comment-delimiter-face)
   (forth-assert-face ".( )" 1 font-lock-comment-face)
@@ -170,3 +176,8 @@ The whitespace before and including \"|\" on each line is removed."
    |  [char] b of bar endof
    |  drop exit
    |endcase"))
+
+(ert-deftest forth-sexp-movements ()
+  (forth-assert-forward-sexp " : foo bar ; \ x" 2 13)
+  (forth-assert-forward-sexp " :noname foo bar ; \ x" 2 19)
+  (forth-assert-forward-sexp " if drop exit else 1+ then bar " 2 27))
