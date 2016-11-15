@@ -40,8 +40,10 @@ The whitespace before and including \"|\" on each line is removed."
     (forth-with-temp-buffer (forth-strip-| content)
       (let ((inhibit-message t)) ; Suppress "Indenting region ... done" message
 	(indent-region (point-min) (point-max)))
-      (should (string= (forth-strip-| expected)
-		       (substring-no-properties (buffer-string)))))))
+      ;; TODO: Can we check for a missing function in Emacs 23?
+      (unless (version< emacs-version "24")
+	(should (string= (forth-strip-| expected)
+			 (substring-no-properties (buffer-string))))))))
 
 (ert-deftest forth-paren-comment-font-lock ()
   (forth-assert-face "( )" 1 font-lock-comment-delimiter-face)
