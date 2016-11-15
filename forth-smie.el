@@ -33,7 +33,23 @@
     (`(:elem . args) 0)
     (`(:list-intro . ,_) forth-smie--basic-indent)))
 
+(defun forth-smie--forward-token ()
+  (forward-comment (point-max))
+  (downcase (buffer-substring-no-properties
+	     (point)
+	     (progn (skip-syntax-forward "w_")
+		    (point)))))
+
+(defun forth-smie--backward-token ()
+  (forward-comment (- (point)))
+  (downcase (buffer-substring-no-properties
+	     (point)
+	     (progn (skip-syntax-backward "w_")
+		    (point)))))
+
 (defun forth-smie-setup ()
-  (smie-setup forth-smie--grammar #'forth-smie--indentation-rules))
+  (smie-setup forth-smie--grammar #'forth-smie--indentation-rules
+	      :forward-token #'forth-smie--forward-token
+	      :backward-token #'forth-smie--backward-token))
 
 (provide 'forth-smie)

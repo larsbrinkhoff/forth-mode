@@ -117,7 +117,13 @@ The whitespace before and including \"|\" on each line is removed."
    |  3 +
    |else
    |  1+
-   |then"))
+   |then")
+  (forth-should-indent
+   "x IF
+   |  3 +
+   |ELSE
+   |  1+
+   |THEN"))
 
 (ert-deftest forth-indent-begin-while-repeat ()
   (forth-should-indent
