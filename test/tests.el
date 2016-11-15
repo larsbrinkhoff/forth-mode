@@ -59,6 +59,7 @@ The whitespace before and including \"|\" on each line is removed."
 (defun forth-assert-forward-word (content start end)
   (forth-with-temp-buffer content
     (goto-char start)
+    (font-lock-ensure) ; Make sure syntax-propertize function is called
     (forward-word)
     (should (= (point) end))))
 
@@ -179,7 +180,9 @@ The whitespace before and including \"|\" on each line is removed."
    |  [char] f of
    |    foo
    |  endof
-   |  [char] b of bar endof
+   |  [char] b of bar
+   |              baz
+   |           endof
    |  drop exit
    |endcase"))
 
