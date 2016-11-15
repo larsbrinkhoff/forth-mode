@@ -23,10 +23,15 @@
      (forth-mode)
      ,@body))
 
+(unless (boundp 'font-lock-ensure)
+  ;; Emacs 24 doesn't have font-lock-ensure.
+  (defun font-lock-ensure ()
+    (font-lock-fontify-buffer)))
+
 (defun forth-assert-face (content pos face)
   (when (boundp 'syntax-propertize-function)
     (forth-with-temp-buffer content
-      (font-lock-fontify-buffer)
+      (font-lock-ensure)
       (should (eq face (get-text-property pos 'face))))))
 
 (defun forth-strip-| (string)
