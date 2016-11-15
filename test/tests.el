@@ -29,6 +29,20 @@
       (font-lock-fontify-buffer)
       (should (eq face (get-text-property pos 'face))))))
 
+(defun forth-strip-| (string)
+  (replace-regexp-in-string "^[ \t]*|" "" (substring-no-properties  string)))
+
+(defun forth-should-indent (expected &optional content)
+  "Assert that CONTENT turns into EXPECTED after the buffer is re-indented.
+If CONTENT is not supplied uses EXPECTED as input.
+The whitespace before and including \"|\" on each line is removed."
+  (let ((content (or content expected)))
+    (forth-with-temp-buffer (forth-strip-| content)
+      (let ((inhibit-message t)) ; Suppress "Indenting region ... done" message
+	(indent-region (point-min) (point-max)))
+      (should (string= (forth-strip-| expected)
+		       (substring-no-properties (buffer-string)))))))
+
 (ert-deftest forth-paren-comment-font-lock ()
   (forth-assert-face "( )" 1 font-lock-comment-delimiter-face)
   (forth-assert-face ".( )" 1 font-lock-comment-face)
@@ -79,3 +93,67 @@
 (ert-deftest forth-parsing-words-font-lock ()
   (forth-assert-face "postpone ( x " 11 nil)
   (forth-assert-face "' s\" x " 6 nil))
+
+(ert-deftest forth-indent-colon-definition ()
+  (forth-should-indent
+   ": foo ( x y -- y x )
+   |  swap
+   |;"))
+
+(ert-deftest forth-indent-if-then-else ()
+  (forth-should-indent
+   "x if
+   |  3 +
+   |then")
+  (forth-should-indent
+   "x if
+   |  3 +
+   |else
+   |  1+
+   |then"))
+
+(ert-deftest forth-indent-begin-while-repeat ()
+  (forth-should-indent
+   "begin
+   |  0>
+   |while
+   |  1-
+   |repeat")
+  (forth-should-indent
+   "begin
+   |  0>
+   |while
+   |  begin
+   |    foo
+   |  while
+   |    bar
+   |  repeat
+   |  1-
+   |repeat"))
+
+;; FIXME: this kind of code is indented poorly (difficult for SMIE)
+;; |: foo ( )
+;; |  begin
+;; |    bar while
+;; |    baz while
+;; |again then then ;
+
+(ert-deftest forth-indent-do ()
+  (forth-should-indent
+   "10 0 ?do
+   |  .
+   |loop")
+  (forth-should-indent
+   "10 0 ?do
+   |  . 2
+   |+loop"))
+
+(ert-deftest forth-indent-case ()
+  (forth-should-indent
+   "x case
+   |  [char] f of
+   |    foo
+   |  endof
+   |  [char] b of bar endof
+   |  drop exit
+   |endcase"))

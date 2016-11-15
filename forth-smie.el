@@ -14,10 +14,10 @@
        ("of" words "endof")
        ("case" words "endcase")
        ("?do" words "loop")
+       ("?do" words "+loop")
        ("do" words "loop")
        ("do" words "+loop")
        ("begin-structure" words "end-structure")
-       ("{:" words ":}")
        (":" words ";"))
       (words)))))
 
