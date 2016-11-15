@@ -27,6 +27,21 @@
 SYNTAX must be a valid argument for `string-to-syntax'."
   `(put-text-property ,start ,end 'syntax-table ',(string-to-syntax syntax)))
 
+;; Set the syntax in the region START/END to "word" or "symbol".  Do
+;; nothing for characters that already have the correct syntax so that
+;; word movement commands work "naturally".
+(defun forth-syntax--set-word-syntax (start end)
+  (save-excursion
+    (goto-char start)
+    (while (progn
+	     (skip-syntax-forward "w_" end)
+	     (cond ((< (point) end)
+		    (let ((start (point)))
+		      (skip-syntax-forward "^w_" end)
+		      (forth-syntax--set-syntax start (point) "_")
+		      t))
+		   (t nil))))))
+
 
 ;;; State functions
 
@@ -77,7 +92,7 @@ SYNTAX must be a valid argument for `string-to-syntax'."
     (skip-chars-forward forth-syntax--non-whitespace)
     (cond ((= start (point)) #'forth-syntax--state-eob)
 	  (t
-	   (forth-syntax--set-syntax start (point) "w")
+	   (forth-syntax--set-word-syntax start (point))
 	   #'forth-syntax--state-normal))))
 
 (defun forth-syntax--parse-comment (backward-regexp forward-regexp)
@@ -143,7 +158,7 @@ SYNTAX must be a valid argument for `string-to-syntax'."
     (skip-chars-forward forth-syntax--non-whitespace)
     (cond ((= start (point)) #'forth-syntax--state-eob)
 	  (t
-	   (forth-syntax--set-syntax start (point) "w")
+	   (forth-syntax--set-word-syntax start (point))
 	   (let ((word (buffer-substring-no-properties start (point))))
 	     (cond ((forth-syntax--lookup word))
 		   (t

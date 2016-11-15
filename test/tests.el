@@ -191,11 +191,8 @@ The whitespace before and including \"|\" on each line is removed."
   (forth-assert-forward-sexp " :noname foo bar ; \ x" 2 19)
   (forth-assert-forward-sexp " if drop exit else 1+ then bar " 2 27))
 
-;; IDEA 1: in words like foo-bar give the "-" a "word constituent"
-;; syntax so that word movement works like in Lisp mode (which
-;; everybody is used to :-).
-;;
-;; IDEA 2: give the filename in "include filename" string syntax.
+;; IDEA: give the filename in "include filename" string syntax.
 (ert-deftest forth-word-movements ()
   (forth-assert-forward-word "include /tmp/foo.fth \ bar" 1 8)
-  (forth-assert-forward-word "include /tmp/foo.fth \ bar" 8 21))
+  (forth-assert-forward-word "include /tmp/foo.fth \ bar" 8 13)
+  (forth-assert-forward-word "foo-bar" 1 4))
