@@ -22,6 +22,10 @@
       (cond ((= start (point)) nil)
 	    (t (buffer-substring-no-properties start (point)))))))
 
+(defmacro forth-syntax--set-syntax (start end syntax)
+  "Set the 'syntax-table property in the region START/END to SYNTAX.
+SYNTAX must be a valid argument for `string-to-syntax'."
+  `(put-text-property ,start ,end 'syntax-table ',(string-to-syntax syntax)))
 
 
 ;;; State functions
@@ -39,35 +43,31 @@
 ;; One line strings
 (defun forth-syntax--state-string ()
   (re-search-backward "\"\\=")
-  (put-text-property (point) (1+ (point))
-		     'syntax-table (string-to-syntax "\""))
+  (forth-syntax--set-syntax (point) (1+ (point)) "\"")
   (forward-char)
   (cond ((re-search-forward "[\"\n]" nil t)
-	 (put-text-property (1- (point)) (point)
-			    'syntax-table (string-to-syntax "\""))
+	 (forth-syntax--set-syntax (1- (point)) (point) "\"")
 	 #'forth-syntax--state-normal)
 	(t
 	 (goto-char (point-max))
-	 #'forth-syntax--state-normal)))
+	 #'forth-syntax--state-eob)))
 
 (defun forth-syntax--state-s\\\" ()
   (re-search-backward "\"\\=")
-  (put-text-property (point) (1+ (point))
-		     'syntax-table (string-to-syntax "\""))
+  (forth-syntax--set-syntax (point) (1+ (point)) "\"")
   (forward-char)
   (while (and (re-search-forward "\\([\"\n]\\|\\\\\"\\)" nil t)
 	      (cond ((= (char-after (match-beginning 0)) ?\\)
-		     (put-text-property (match-beginning 0)
-					(1+ (match-beginning 0))
-					'syntax-table (string-to-syntax "\\"))
+		     (forth-syntax--set-syntax (match-beginning 0)
+					       (1+ (match-beginning 0))
+					       "\\")
 		     t))))
   (cond ((looking-back "[\"\n]" 1)
-	 (put-text-property (1- (point)) (point)
-			    'syntax-table (string-to-syntax "\""))
+	 (forth-syntax--set-syntax (1- (point)) (point) "\"")
 	 #'forth-syntax--state-normal)
 	(t
 	 (goto-char (point-max))
-	 #'forth-syntax--state-normal)))
+	 #'forth-syntax--state-eob)))
 
 ;; State for words that parse the following word, e.g. POSTPONE S"
 ;; where POSTPONE parses S".
@@ -77,23 +77,20 @@
     (skip-chars-forward forth-syntax--non-whitespace)
     (cond ((= start (point)) #'forth-syntax--state-eob)
 	  (t
-	   (put-text-property start (point)
-			      'syntax-table (string-to-syntax "_"))
+	   (forth-syntax--set-syntax start (point) "w")
 	   #'forth-syntax--state-normal))))
 
 (defun forth-syntax--parse-comment (backward-regexp forward-regexp)
   (let ((pos (point)))
     (re-search-backward backward-regexp)
-    (put-text-property (point) (1+ (point))
-		       'syntax-table (string-to-syntax "<"))
+    (forth-syntax--set-syntax (point) (1+ (point)) "<")
     (goto-char pos)
     (cond ((re-search-forward forward-regexp nil t)
-	   (put-text-property (1- (point)) (point)
-			      'syntax-table (string-to-syntax ">"))
+	   (forth-syntax--set-syntax (1- (point)) (point) ">")
 	   #'forth-syntax--state-normal)
 	  (t
 	   (goto-char (point-max))
-	   #'forth-syntax--state-normal))))
+	   #'forth-syntax--state-eob))))
 
 ;; Define a state-function for comments.  The comment starts with
 ;; the string BEGIN and ends with the string END.
@@ -138,7 +135,7 @@
   (gethash (downcase word) forth-syntax--parsers))
 
 ;; Look for the next whitespace delimited word; mark all its
-;; characters as "symbol constituents"; finally return state-function
+;; characters as "word constituents"; finally return state-function
 ;; for the word.
 (defun forth-syntax--state-normal ()
   (skip-chars-forward forth-syntax--whitespace)
@@ -146,8 +143,7 @@
     (skip-chars-forward forth-syntax--non-whitespace)
     (cond ((= start (point)) #'forth-syntax--state-eob)
 	  (t
-	   (put-text-property start (point)
-			      'syntax-table (string-to-syntax "_"))
+	   (forth-syntax--set-syntax start (point) "w")
 	   (let ((word (buffer-substring-no-properties start (point))))
 	     (cond ((forth-syntax--lookup word))
 		   (t
