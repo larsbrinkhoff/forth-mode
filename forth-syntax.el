@@ -58,10 +58,10 @@ SYNTAX must be a valid argument for `string-to-syntax'."
 ;; One line strings
 (defun forth-syntax--state-string ()
   (re-search-backward "\"\\=")
-  (forth-syntax--set-syntax (point) (1+ (point)) "\"")
+  (forth-syntax--set-syntax (point) (1+ (point)) "|")
   (forward-char)
   (cond ((re-search-forward "[\"\n]" nil t)
-	 (forth-syntax--set-syntax (1- (point)) (point) "\"")
+	 (forth-syntax--set-syntax (1- (point)) (point) "|")
 	 #'forth-syntax--state-normal)
 	(t
 	 (goto-char (point-max))
@@ -69,16 +69,16 @@ SYNTAX must be a valid argument for `string-to-syntax'."
 
 (defun forth-syntax--state-s\\\" ()
   (re-search-backward "\"\\=")
-  (forth-syntax--set-syntax (point) (1+ (point)) "\"")
+  (forth-syntax--set-syntax (point) (1+ (point)) "|")
   (forward-char)
-  (while (and (re-search-forward "\\([\"\n]\\|\\\\\"\\)" nil t)
+  (while (and (re-search-forward "\\([\"\n]\\|\\\\\\\\\\|\\\\\"\\)" nil t)
 	      (cond ((= (char-after (match-beginning 0)) ?\\)
 		     (forth-syntax--set-syntax (match-beginning 0)
 					       (1+ (match-beginning 0))
 					       "\\")
 		     t))))
   (cond ((looking-back "[\"\n]" 1)
-	 (forth-syntax--set-syntax (1- (point)) (point) "\"")
+	 (forth-syntax--set-syntax (1- (point)) (point) "|")
 	 #'forth-syntax--state-normal)
 	(t
 	 (goto-char (point-max))
