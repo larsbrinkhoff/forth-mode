@@ -203,3 +203,11 @@ The whitespace before and including \"|\" on each line is removed."
   (forth-assert-forward-word "include /tmp/foo.fth \ bar" 1 8)
   (forth-assert-forward-word "include /tmp/foo.fth \ bar" 8 13)
   (forth-assert-forward-word "foo-bar" 1 4))
+
+(ert-deftest forth-spec-parsing ()
+  (should (equal (forth-spec--build-url "SWAP" 1994)
+		 "http://lars.nocrew.org/dpans/dpans6.htm#6.1.2260"))
+  (should
+   (equal (forth-spec--build-url "SWAP" 2012)
+	  "http://www.forth200x.org/documents/html/core.html#core:SWAP")))
+

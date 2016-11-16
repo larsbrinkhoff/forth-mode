@@ -15,6 +15,7 @@
 (require 'cl)
 (require 'forth-syntax)
 (require 'forth-smie)
+(require 'forth-spec)
 
 (defvar forth-mode-map
   (let ((map (make-sparse-keymap)))
@@ -27,6 +28,8 @@
     (define-key map (kbd "C-x M-e") 'forth-eval-last-expression-display-output)
     (define-key map (kbd "C-c C-z") 'forth-switch-to-output-buffer)
     (define-key map (kbd "C-c :") 'forth-eval)
+    (define-key map (kbd "C-c C-d 1") 'forth-spec-lookup-1994)
+    (define-key map (kbd "C-c C-d 2") 'forth-spec-lookup-2012)
     ;; (define-key map (kbd "C-c C-c") 'eval-buffer)
     ;; (define-key map (kbd "C-x `") #'forth-next-error)
     ;; (define-key map (kbd "M-n") #'forth-next-note)
