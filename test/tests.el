@@ -63,6 +63,24 @@ The whitespace before and including \"|\" on each line is removed."
     (forward-word)
     (should (= (point) end))))
 
+(defun forth-strip-|-and-↓ (string)
+  (let* ((s2 (forth-strip-| string))
+	 (pos (string-match "↓" s2)))
+    (cons (delete ?↓ s2) pos)))
+
+(defun forth-should-before/after (before after fun)
+  (let* ((before+point (forth-strip-|-and-↓ before))
+	 (before (car before+point))
+	 (point-before (cdr before+point))
+	 (after+point (forth-strip-|-and-↓ after))
+	 (after (car after+point))
+	 (point-after (cdr after+point)))
+    (forth-with-temp-buffer before
+      (goto-char point-before)
+      (funcall fun)
+      (should (string= after (substring-no-properties (buffer-string))))
+      (should (= (point) point-after)))))
+
 (ert-deftest forth-paren-comment-font-lock ()
   (forth-assert-face "( )" 1 font-lock-comment-delimiter-face)
   (forth-assert-face ".( )" 1 font-lock-comment-face)
@@ -211,3 +229,11 @@ The whitespace before and including \"|\" on each line is removed."
    (equal (forth-spec--build-url "SWAP" 2012)
 	  "http://www.forth200x.org/documents/html/core.html#core:SWAP")))
 
+(ert-deftest forth-fill-comment ()
+  (forth-should-before/after
+   "\\ foo bar
+   |\\ baz↓
+   |: frob ( x y -- z ) ;"
+   "\\ foo bar baz↓
+   |: frob ( x y -- z ) ;"
+   #'fill-paragraph))

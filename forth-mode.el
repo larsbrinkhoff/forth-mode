@@ -110,6 +110,15 @@
        (or (forth-block-with-newlines-p)
 	   (forth-block-without-newlines-p))))
 
+;; This just calls the standard `fill-paragraph' with adjusted
+;; paramaters.
+(defun forth-fill-paragraph (&rest args)
+  (let ((fill-paragraph-function nil)
+	(fill-paragraph-handle-comment t)
+	(comment-start "\ ")
+	(comment-end ""))
+    (apply #'fill-paragraph args)))
+
 (unless (fboundp 'prog-mode)
   (defalias 'prog-mode 'fundamental-mode))
 
@@ -129,6 +138,7 @@
     (setq-local syntax-propertize-function #'forth-syntax-propertize))
   (setq-local parse-sexp-lookup-properties t)
   (forth-smie-setup)
+  (setq-local fill-paragraph-function #'forth-fill-paragraph)
   (setq ;; font-lock-defaults
 	comment-start-skip "\\((\\*?\\|\\\\\\) *"
 	comment-start "("
