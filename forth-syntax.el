@@ -84,9 +84,21 @@ SYNTAX must be a valid argument for `string-to-syntax'."
 	 (goto-char (point-max))
 	 #'forth-syntax--state-eob)))
 
+;; For the word before point, set the font-lock-face property.
+(defun forth-syntax--mark-font-lock-keyword ()
+  (let ((pos (point)))
+    (skip-chars-backward forth-syntax--non-whitespace)
+    (put-text-property (point) pos 'font-lock-face font-lock-keyword-face)
+    (goto-char pos)))
+
+(defun forth-syntax--state-font-lock-keyword ()
+  (forth-syntax--mark-font-lock-keyword)
+  (forth-syntax--state-normal))
+
 ;; State for words that parse the following word, e.g. POSTPONE S"
 ;; where POSTPONE parses S".
 (defun forth-syntax--state-parsing-word ()
+  (forth-syntax--mark-font-lock-keyword)
   (skip-chars-forward forth-syntax--whitespace)
   (let ((start (point)))
     (skip-chars-forward forth-syntax--non-whitespace)
@@ -128,6 +140,10 @@ SYNTAX must be a valid argument for `string-to-syntax'."
 (defun forth-syntax--define (word parsing-function)
   (setf (gethash (downcase word) forth-syntax--parsers) parsing-function))
 
+;; Find the parsing function for WORD.
+(defun forth-syntax--lookup (word)
+  (gethash (downcase word) forth-syntax--parsers))
+
 (forth-syntax--define "s\"" #'forth-syntax--state-string)
 (forth-syntax--define ".\"" #'forth-syntax--state-string)
 (forth-syntax--define "c\"" #'forth-syntax--state-string)
@@ -145,9 +161,17 @@ SYNTAX must be a valid argument for `string-to-syntax'."
 (forth-syntax--define "[']" #'forth-syntax--state-parsing-word)
 (forth-syntax--define ":" #'forth-syntax--state-parsing-word)
 
-;; Find the parsing function for WORD.
-(defun forth-syntax--lookup (word)
-  (gethash (downcase word) forth-syntax--parsers))
+(defvar forth-syntax--font-lock-keywords
+  '("variable" "constant" "value" "create"
+    "if" "else" "then"
+    "?do" "do" "unloop" "exit" "loop" "+loop"
+    "begin" "while" "repeat" "again" "until"
+    "case" "of" "endof" "endcase"
+    ":noname" ";" "does>"
+    "literal" "immediate"))
+
+(dolist (w forth-syntax--font-lock-keywords)
+  (forth-syntax--define w #'forth-syntax--state-font-lock-keyword))
 
 ;; Look for the next whitespace delimited word; mark all its
 ;; characters as "word constituents"; finally return state-function
@@ -195,6 +219,7 @@ SYNTAX must be a valid argument for `string-to-syntax'."
 ;; until the position END is reached.
 (defun forth-syntax-propertize (start end)
   (save-excursion
+    (remove-text-properties start end '(font-lock-face))
     (let* ((guess (forth-syntax--guess-state start))
 	   (state (cdr guess)))
       ;;(message "forth-syntax-propertize: %s %s %s" start end guess)
