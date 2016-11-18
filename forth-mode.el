@@ -63,9 +63,6 @@
 
 (defvar forth-mode-hook)
 
-(defvar forth-font-lock-keywords
-  '((forth-match-definition 3 font-lock-function-name-face)))
-
 (defun forth-symbol-start ()
   (save-excursion
     (re-search-backward "[^[:graph:]]")
@@ -132,7 +129,7 @@
 		     :syntax-table forth-mode-syntax-table
   (if (forth-block-p)
       (forth-block-mode))
-  (setq font-lock-defaults '(forth-font-lock-keywords))
+  (setq font-lock-defaults '(nil))
   (setq-local completion-at-point-functions '(forth-expand-symbol))
   (when (boundp 'syntax-propertize-function)
     (setq-local syntax-propertize-function #'forth-syntax-propertize))
@@ -164,13 +161,6 @@
     (speedbar-add-supported-extension ".fs")
     (speedbar-add-supported-extension ".fth")
     (speedbar-add-supported-extension ".4th")))
-
-;;; : ; does> variable constant value
-;;; if else then  do loop begin while repeat again until  postpone
-
-(defun forth-match-definition (limit)
-  (search-forward-regexp "\\(^\\|\\s-\\)\\(\\S-*:\\|code\\|defer\\|2?variable\\|create\\|2?value\\|2?constant\\)\\s-+\\([[:graph:]]+\\)"
-			 limit t))
 
 (defun forth-beginning ()
   (goto-char (point-min)))

@@ -1,4 +1,4 @@
-;; forth-syntax.el -- syntax-propertize function for forth-mode
+;;; forth-syntax.el -- syntax-propertize function       -*-lexical-binding:t-*-
 
 ;; This code mimics the Forth text interpreter and adds text
 ;; properties as side effect.
@@ -11,14 +11,20 @@
 (defvar forth-syntax--whitespace " \t\n\f\r")
 (defvar forth-syntax--non-whitespace (concat "^" forth-syntax--whitespace))
 
+;; Skip forward over whitespace and the following word. Return the
+;; start position of the word.
+(defun forth-syntax--skip-word ()
+  (skip-chars-forward forth-syntax--whitespace)
+  (let ((start (point)))
+    (skip-chars-forward forth-syntax--non-whitespace)
+    start))
+
 ;; Return the whitespace-delimited word at position POS.
 ;; Return nil if POS is at end-of-buffer.
 (defun forth-syntax--word-at (pos)
   (save-excursion
     (goto-char pos)
-    (skip-chars-forward forth-syntax--whitespace)
-    (let ((start (point)))
-      (skip-chars-forward forth-syntax--non-whitespace)
+    (let ((start (forth-syntax--skip-word)))
       (cond ((= start (point)) nil)
 	    (t (buffer-substring-no-properties start (point)))))))
 
@@ -57,9 +63,7 @@ SYNTAX must be a valid argument for `string-to-syntax'."
 
 ;; One line strings
 (defun forth-syntax--state-string ()
-  (re-search-backward "\"\\=")
-  (forth-syntax--set-syntax (point) (1+ (point)) "|")
-  (forward-char)
+  (forth-syntax--set-syntax (1- (point)) (point) "|")
   (cond ((re-search-forward "[\"\n]" nil t)
 	 (forth-syntax--set-syntax (1- (point)) (point) "|")
 	 #'forth-syntax--state-normal)
@@ -68,9 +72,7 @@ SYNTAX must be a valid argument for `string-to-syntax'."
 	 #'forth-syntax--state-eob)))
 
 (defun forth-syntax--state-s\\\" ()
-  (re-search-backward "\"\\=")
-  (forth-syntax--set-syntax (point) (1+ (point)) "|")
-  (forward-char)
+  (forth-syntax--set-syntax (1- (point)) (point) "|")
   (while (and (re-search-forward "\\([\"\n]\\|\\\\\\\\\\|\\\\\"\\)" nil t)
 	      (cond ((= (char-after (match-beginning 0)) ?\\)
 		     (forth-syntax--set-syntax (match-beginning 0)
@@ -84,27 +86,54 @@ SYNTAX must be a valid argument for `string-to-syntax'."
 	 (goto-char (point-max))
 	 #'forth-syntax--state-eob)))
 
+;; The position where the current word started.  It is setup by
+;; `forth-syntax--state-normal'.  It avoids the need to scan backward
+;; so often.
+(defvar forth-syntax--current-word-start -1)
+
 ;; For the word before point, set the font-lock-face property.
 (defun forth-syntax--mark-font-lock-keyword ()
-  (let ((pos (point)))
-    (skip-chars-backward forth-syntax--non-whitespace)
-    (put-text-property (point) pos 'font-lock-face font-lock-keyword-face)
-    (goto-char pos)))
+  (let ((start forth-syntax--current-word-start))
+    (put-text-property start (point) 'font-lock-face font-lock-keyword-face)))
 
 (defun forth-syntax--state-font-lock-keyword ()
   (forth-syntax--mark-font-lock-keyword)
   (forth-syntax--state-normal))
 
+
 ;; State for words that parse the following word, e.g. POSTPONE S"
 ;; where POSTPONE parses S".
+;;
+;; FIXME: It would nice be to know if we are in compilation state for
+;; things like this: : FOO CREATE , ;
+;; Because in this case CREATE doesn't parse immediately.
 (defun forth-syntax--state-parsing-word ()
-  (forth-syntax--mark-font-lock-keyword)
-  (skip-chars-forward forth-syntax--whitespace)
-  (let ((start (point)))
-    (skip-chars-forward forth-syntax--non-whitespace)
-    (cond ((= start (point)) #'forth-syntax--state-eob)
+  (let ((start (forth-syntax--skip-word)))
+    (cond ((= start (point))
+	   #'forth-syntax--state-eob)
 	  (t
 	   (forth-syntax--set-word-syntax start (point))
+	   #'forth-syntax--state-normal))))
+
+;; This is like `forth-syntax--state-parsing-word' but additionally
+;; sets the font-lock-keyword-face.
+(defun forth-syntax--state-parsing-keyword ()
+  (forth-syntax--mark-font-lock-keyword)
+  (forth-syntax--state-parsing-word))
+
+;; This is also like `forth-syntax--state-parsing-word' but
+;; additionally set font-lock-keyword-face for the current word and
+;; font-lock-function-name-face for the following word.
+;; It's intended for thigs like: DEFER S"
+(defun forth-syntax--state-defining-word ()
+  (forth-syntax--mark-font-lock-keyword)
+  (let ((start (forth-syntax--skip-word)))
+    (cond ((= start (point))
+	   #'forth-syntax--state-eob)
+	  (t
+	   (forth-syntax--set-word-syntax start (point))
+	   (put-text-property start (point) 'font-lock-face
+			      font-lock-function-name-face)
 	   #'forth-syntax--state-normal))))
 
 (defun forth-syntax--parse-comment (backward-regexp forward-regexp)
@@ -156,19 +185,31 @@ SYNTAX must be a valid argument for `string-to-syntax'."
 (forth-syntax--define ".(" #'forth-syntax--state-.\()
 (forth-syntax--define "{:" #'forth-syntax--state-{:)
 
-(forth-syntax--define "postpone" #'forth-syntax--state-parsing-word)
-(forth-syntax--define "'" #'forth-syntax--state-parsing-word)
-(forth-syntax--define "[']" #'forth-syntax--state-parsing-word)
-(forth-syntax--define ":" #'forth-syntax--state-parsing-word)
+(forth-syntax--define "postpone" #'forth-syntax--state-parsing-keyword)
+
+(defvar forth-syntax--parsing-words
+  '("'" "[']" "char" "[char]"))
+
+(defvar forth-syntax--defining-words
+  '(":" "create" "synonym" "defer" "code"
+    "constant" "2constant" "fconstant"
+    "value" "2value" "fvalue"
+    "variable" "2variable" "fvariable"))
 
 (defvar forth-syntax--font-lock-keywords
-  '("variable" "constant" "value" "create"
-    "if" "else" "then"
+  '("if" "else" "then"
     "?do" "do" "unloop" "exit" "loop" "+loop"
     "begin" "while" "repeat" "again" "until"
     "case" "of" "endof" "endcase"
-    ":noname" ";" "does>"
-    "literal" "immediate"))
+    ":noname" ";" "does>" "immediate"
+    "is" "to"
+    "literal" "2literal" "fliteral" "sliteral"))
+
+(dolist (w forth-syntax--parsing-words)
+  (forth-syntax--define w #'forth-syntax--state-parsing-word))
+
+(dolist (w forth-syntax--defining-words)
+  (forth-syntax--define w #'forth-syntax--state-defining-word))
 
 (dolist (w forth-syntax--font-lock-keywords)
   (forth-syntax--define w #'forth-syntax--state-font-lock-keyword))
@@ -177,16 +218,15 @@ SYNTAX must be a valid argument for `string-to-syntax'."
 ;; characters as "word constituents"; finally return state-function
 ;; for the word.
 (defun forth-syntax--state-normal ()
-  (skip-chars-forward forth-syntax--whitespace)
-  (let ((start (point)))
-    (skip-chars-forward forth-syntax--non-whitespace)
-    (cond ((= start (point)) #'forth-syntax--state-eob)
+  (let ((start (forth-syntax--skip-word)))
+    (cond ((= start (point))
+	   #'forth-syntax--state-eob)
 	  (t
 	   (forth-syntax--set-word-syntax start (point))
+	   (setq forth-syntax--current-word-start start)
 	   (let ((word (buffer-substring-no-properties start (point))))
-	     (cond ((forth-syntax--lookup word))
-		   (t
-		    #'forth-syntax--state-normal)))))))
+	     (or (forth-syntax--lookup word)
+		 #'forth-syntax--state-normal))))))
 
 
 ;;; Guess initial state
