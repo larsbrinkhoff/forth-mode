@@ -28,14 +28,27 @@
   (defun font-lock-ensure ()
     (font-lock-fontify-buffer)))
 
-(defun forth-assert-face (content pos face)
-  (when (boundp 'syntax-propertize-function)
-    (forth-with-temp-buffer content
-      (font-lock-ensure)
-      (should (eq face (get-text-property pos 'face))))))
-
 (defun forth-strip-| (string)
   (replace-regexp-in-string "^[ \t]*|" "" (substring-no-properties  string)))
+
+(defun forth-strip-|-and-→ (string)
+  (let* ((s2 (forth-strip-| string))
+	 (pos (1+ (string-match "→" s2))))
+    (list (delete ?→ s2) pos)))
+
+(defun forth-strip-|-and-¹² (string)
+  (let* ((s2 (forth-strip-| string))
+	 (start (1+ (string-match "¹" (delete ?² s2))))
+	 (end (1+ (string-match "²" (delete ?¹ s2)))))
+    (list (delete ?² (delete ?¹ s2))
+	  start end)))
+
+(defun forth-assert-face (content face)
+  (when (boundp 'syntax-propertize-function)
+    (destructuring-bind (content pos) (forth-strip-|-and-→ content)
+      (forth-with-temp-buffer content
+	(font-lock-ensure)
+	(should (eq face (get-text-property pos 'face)))))))
 
 (defun forth-should-indent (expected &optional content)
   "Assert that CONTENT turns into EXPECTED after the buffer is re-indented.
@@ -50,94 +63,87 @@ The whitespace before and including \"|\" on each line is removed."
 	(should (string= (forth-strip-| expected)
 			 (substring-no-properties (buffer-string))))))))
 
-(defun forth-assert-forward-sexp (content start end)
-  (forth-with-temp-buffer content
-    (goto-char start)
-    (forward-sexp)
-    (should (= (point) end))))
+(defun forth-assert-forward-sexp (content)
+  (destructuring-bind (content start end) (forth-strip-|-and-¹² content)
+    (forth-with-temp-buffer content
+      (goto-char start)
+      (forward-sexp)
+      (should (= (point) end)))))
 
-(defun forth-assert-forward-word (content start end)
-  (forth-with-temp-buffer content
-    (goto-char start)
-    (font-lock-ensure) ; Make sure syntax-propertize function is called
-    (forward-word)
-    (should (= (point) end))))
-
-(defun forth-strip-|-and-↓ (string)
-  (let* ((s2 (forth-strip-| string))
-	 (pos (string-match "↓" s2)))
-    (cons (delete ?↓ s2) pos)))
+(defun forth-assert-forward-word (content)
+  (destructuring-bind (content start end) (forth-strip-|-and-¹² content)
+    (forth-with-temp-buffer content
+      (goto-char start)
+      (font-lock-ensure) ; Make sure syntax-propertize function is called
+      (forward-word)
+      (should (= (point) end)))))
 
 (defun forth-should-before/after (before after fun)
-  (let* ((before+point (forth-strip-|-and-↓ before))
-	 (before (car before+point))
-	 (point-before (cdr before+point))
-	 (after+point (forth-strip-|-and-↓ after))
-	 (after (car after+point))
-	 (point-after (cdr after+point)))
-    (forth-with-temp-buffer before
-      (goto-char point-before)
-      (funcall fun)
-      (should (string= after (substring-no-properties (buffer-string))))
-      (should (= (point) point-after)))))
+  (destructuring-bind (before point-before) (forth-strip-|-and-→ before)
+    (destructuring-bind (after point-after) (forth-strip-|-and-→ after)
+      (forth-with-temp-buffer before
+	(goto-char point-before)
+	(funcall fun)
+	(should (string= after (substring-no-properties (buffer-string))))
+	(should (= (point) point-after))))))
 
 (ert-deftest forth-paren-comment-font-lock ()
-  (forth-assert-face "( )" 1 font-lock-comment-delimiter-face)
-  (forth-assert-face ".( )" 1 font-lock-comment-face)
-  (forth-assert-face "( )" 3 font-lock-comment-delimiter-face)
-  (forth-assert-face " ( )" 2 font-lock-comment-delimiter-face)
-  (forth-assert-face "\t( )" 2 font-lock-comment-delimiter-face)
-  (forth-assert-face "(\t)" 1 font-lock-comment-delimiter-face)
-  (forth-assert-face "(foo) " 3 nil)
-  (forth-assert-face "(foo)" 3 nil)
-  (forth-assert-face "() " 2 nil)
-  (forth-assert-face "( foo) " 3 font-lock-comment-face)
+  (forth-assert-face "→( )" font-lock-comment-delimiter-face)
+  (forth-assert-face "→.( )" font-lock-comment-face)
+  (forth-assert-face "( →)" font-lock-comment-delimiter-face)
+  (forth-assert-face " →( )" font-lock-comment-delimiter-face)
+  (forth-assert-face "\t→( )" font-lock-comment-delimiter-face)
+  (forth-assert-face "→(\t)" font-lock-comment-delimiter-face)
+  (forth-assert-face "(fo→o) " nil)
+  (forth-assert-face "(fo→o)" nil)
+  (forth-assert-face "(→) " nil)
+  (forth-assert-face "( →foo) " font-lock-comment-face)
   (forth-assert-face "( a b --
-                        x y )" 1 font-lock-comment-delimiter-face))
+                        →x y )" font-lock-comment-face))
 
 (ert-deftest forth-backslash-comment-font-lock ()
-  (forth-assert-face "\\" 1 nil)
-  (forth-assert-face "\\ " 1 font-lock-comment-delimiter-face)
-  (forth-assert-face " \\" 2 nil)
-  (forth-assert-face "\t\\ " 2 font-lock-comment-delimiter-face)
-  (forth-assert-face " \\\t" 2 font-lock-comment-delimiter-face)
-  (forth-assert-face " \\\n" 2 font-lock-comment-delimiter-face)
-  (forth-assert-face "a\\b" 2 nil)
-  (forth-assert-face "a\\b " 2 nil))
+  (forth-assert-face "→\\" nil)
+  (forth-assert-face "→\\ " font-lock-comment-delimiter-face)
+  (forth-assert-face " →\\" nil)
+  (forth-assert-face "\t→\\ " font-lock-comment-delimiter-face)
+  (forth-assert-face " →\\\t" font-lock-comment-delimiter-face)
+  (forth-assert-face " →\\\n" font-lock-comment-delimiter-face)
+  (forth-assert-face "a→\\b" nil)
+  (forth-assert-face "a→\\b " nil))
 
 (ert-deftest forth-brace-colon-font-lock ()
-  (forth-assert-face "{: :}" 1 font-lock-comment-face)
-  (forth-assert-face "{: :}" 5 font-lock-comment-face)
-  (forth-assert-face "{: a b :}" 4 font-lock-comment-face)
-  (forth-assert-face "{::}" 1 nil)
+  (forth-assert-face "→{: :}" font-lock-comment-face)
+  (forth-assert-face "{: :→}" font-lock-comment-face)
+  (forth-assert-face "{: →a b :}" font-lock-comment-face)
+  (forth-assert-face "→{::}" nil)
   (forth-assert-face "{: a b --
-                         x y :}" 1 font-lock-comment-face)
-  (forth-assert-face "t{ 2 1+ -> 3 }t" 2 nil))
+                         →x y :}" font-lock-comment-face)
+  (forth-assert-face "t→{ 2 1+ -> 3 }t" nil))
 
 (ert-deftest forth-string-font-lock ()
-  (forth-assert-face "s\" ab\"" 1 nil)
-  (forth-assert-face "s\" ab\"" 2 font-lock-string-face)
-  (forth-assert-face "abort\" ab\"" 6 font-lock-string-face)
-  (forth-assert-face ".\" ab\"" 2 font-lock-string-face)
-  (forth-assert-face "c\" ab\"" 2 font-lock-string-face)
-  (forth-assert-face "[char] \" of" 10 nil)
-  (forth-assert-face "frob\" ab\" " 6 nil)
-  (forth-assert-face "s\" 4 \n 8 " 4 font-lock-string-face)
-  (forth-assert-face "s\" 4 \n 8 " 8 nil)
-  (forth-assert-face "s\\\" ab\"" 1 nil)
-  (forth-assert-face "s\\\" ab\"" 3 font-lock-string-face)
-  (forth-assert-face "s\\\" ab\"" 6 font-lock-string-face)
-  (forth-assert-face "s\\\" a\\\"c\"" 7 font-lock-string-face)
-  (forth-assert-face "s\\\" \\\\ 7 \" 12" 7 font-lock-string-face)
-  (forth-assert-face "s\\\" \\\\ 7 \" 12" 12 nil)
-  (forth-assert-face "s\\\" \\\" 7 \" 12" 7 font-lock-string-face)
-  (forth-assert-face "s\\\" \\\" 7 \" 12" 12 nil)
-  (forth-assert-face "s\\\" 5 \n 9 " 4 font-lock-string-face)
-  (forth-assert-face "s\\\" 5 \n 9 " 9 nil))
+  (forth-assert-face "→s\" ab\"" nil)
+  (forth-assert-face "s→\" ab\"" font-lock-string-face)
+  (forth-assert-face "abort→\" ab\"" font-lock-string-face)
+  (forth-assert-face ".→\" ab\"" font-lock-string-face)
+  (forth-assert-face "c→\" ab\"" font-lock-string-face)
+  (forth-assert-face "[char] \" →of" nil)
+  (forth-assert-face "frob\" →ab\" " nil)
+  (forth-assert-face "s\" →a \n b " font-lock-string-face)
+  (forth-assert-face "s\" a \n →b " nil)
+  (forth-assert-face "→s\\\" ab\"" nil)
+  (forth-assert-face "s\\→\" ab\"" font-lock-string-face)
+  (forth-assert-face "s\\\" a→b\"" font-lock-string-face)
+  (forth-assert-face "s\\\" a\\\"→c\"" font-lock-string-face)
+  (forth-assert-face "s\\\" \\\\ →a \" b" font-lock-string-face)
+  (forth-assert-face "s\\\" \\\\ a \" →b" nil)
+  (forth-assert-face "s\\\" \\\" →a \" b" font-lock-string-face)
+  (forth-assert-face "s\\\" \\\" a \" →b" nil)
+  (forth-assert-face "s\\\" →a \n b " font-lock-string-face)
+  (forth-assert-face "s\\\" a \n →b " nil))
 
 (ert-deftest forth-parsing-words-font-lock ()
-  (forth-assert-face "postpone ( x " 11 nil)
-  (forth-assert-face "' s\" x " 6 nil))
+  (forth-assert-face "postpone ( →x " nil)
+  (forth-assert-face "' s\" →x "nil))
 
 (ert-deftest forth-indent-colon-definition ()
   (forth-should-indent
@@ -212,15 +218,15 @@ The whitespace before and including \"|\" on each line is removed."
    |endcase"))
 
 (ert-deftest forth-sexp-movements ()
-  (forth-assert-forward-sexp " : foo bar ; \ x" 2 13)
-  (forth-assert-forward-sexp " :noname foo bar ; \ x" 2 19)
-  (forth-assert-forward-sexp " if drop exit else 1+ then bar " 2 27))
+  (forth-assert-forward-sexp " ¹: foo bar ;² \ x")
+  (forth-assert-forward-sexp " ¹:noname foo bar ;² \ x")
+  (forth-assert-forward-sexp " ¹if drop exit else 1+ then² bar "))
 
 ;; IDEA: give the filename in "include filename" string syntax.
 (ert-deftest forth-word-movements ()
-  (forth-assert-forward-word "include /tmp/foo.fth \ bar" 1 8)
-  (forth-assert-forward-word "include /tmp/foo.fth \ bar" 8 13)
-  (forth-assert-forward-word "foo-bar" 1 4))
+  (forth-assert-forward-word "¹include² /tmp/foo.fth \ bar")
+  (forth-assert-forward-word "include¹ /tmp²/foo.fth \ bar")
+  (forth-assert-forward-word "¹foo²-bar"))
 
 (ert-deftest forth-spec-parsing ()
   (should (equal (forth-spec--build-url "SWAP" 1994)
@@ -232,8 +238,8 @@ The whitespace before and including \"|\" on each line is removed."
 (ert-deftest forth-fill-comment ()
   (forth-should-before/after
    "\\ foo bar
-   |\\ baz↓
+   |\\ baz→
    |: frob ( x y -- z ) ;"
-   "\\ foo bar baz↓
+   "\\ foo bar baz→
    |: frob ( x y -- z ) ;"
    #'fill-paragraph))
