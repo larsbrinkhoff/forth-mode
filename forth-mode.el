@@ -136,11 +136,10 @@
   (setq-local parse-sexp-lookup-properties t)
   (forth-smie-setup)
   (setq-local fill-paragraph-function #'forth-fill-paragraph)
-  (setq ;; font-lock-defaults
-	comment-start-skip "\\((\\*?\\|\\\\\\) *"
-	comment-start "("
-	comment-end ")"
-	imenu-generic-expression
+  (setq-local comment-start-skip "\\(?:(\\*\\|\\\\\\) *")
+  (setq-local comment-start "(")
+  (setq-local comment-end ")")
+  (setq imenu-generic-expression
 	'(("Words"
 	   "^\\s-*\\(:\\|code\\|defer\\)\\s-+\\(\\(\\sw\\|\\s_\\)+\\)" 2)
 	  ("Variables"
