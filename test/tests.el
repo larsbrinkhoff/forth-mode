@@ -34,13 +34,13 @@
 (defun forth-strip-|-and-→ (string)
   (let* ((s2 (forth-strip-| string))
 	 (pos (1+ (string-match "→" s2))))
-    (list (delete ?→ s2) pos)))
+    (list (remove ?→ s2) pos)))
 
 (defun forth-strip-|-and-¹² (string)
   (let* ((s2 (forth-strip-| string))
-	 (start (1+ (string-match "¹" (delete ?² s2))))
-	 (end (1+ (string-match "²" (delete ?¹ s2)))))
-    (list (delete ?² (delete ?¹ s2))
+	 (start (1+ (string-match "¹" (remove ?² s2))))
+	 (end (1+ (string-match "²" (remove ?¹ s2)))))
+    (list (remove ?² (remove ?¹ s2))
 	  start end)))
 
 (defun forth-assert-face (content face)
@@ -48,7 +48,8 @@
     (destructuring-bind (content pos) (forth-strip-|-and-→ content)
       (forth-with-temp-buffer content
 	(font-lock-ensure)
-	(should (eq face (get-text-property pos 'face)))))))
+	(should (eq face (or (get-text-property pos 'face)
+			     (get-text-property pos 'font-lock-face))))))))
 
 (defun forth-should-indent (expected &optional content)
   "Assert that CONTENT turns into EXPECTED after the buffer is re-indented.
@@ -102,9 +103,9 @@ The whitespace before and including \"|\" on each line is removed."
                         →x y )" font-lock-comment-face))
 
 (ert-deftest forth-backslash-comment-font-lock ()
-  (forth-assert-face "→\\" nil)
+  (forth-assert-face "→\\" font-lock-comment-delimiter-face)
   (forth-assert-face "→\\ " font-lock-comment-delimiter-face)
-  (forth-assert-face " →\\" nil)
+  (forth-assert-face " →\\" font-lock-comment-delimiter-face)
   (forth-assert-face "\t→\\ " font-lock-comment-delimiter-face)
   (forth-assert-face " →\\\t" font-lock-comment-delimiter-face)
   (forth-assert-face " →\\\n" font-lock-comment-delimiter-face)
@@ -126,7 +127,7 @@ The whitespace before and including \"|\" on each line is removed."
   (forth-assert-face "abort→\" ab\"" font-lock-string-face)
   (forth-assert-face ".→\" ab\"" font-lock-string-face)
   (forth-assert-face "c→\" ab\"" font-lock-string-face)
-  (forth-assert-face "[char] \" →of" nil)
+  (forth-assert-face "[char] \" →swap" nil)
   (forth-assert-face "frob\" →ab\" " nil)
   (forth-assert-face "s\" →a \n b " font-lock-string-face)
   (forth-assert-face "s\" a \n →b " nil)
@@ -143,7 +144,20 @@ The whitespace before and including \"|\" on each line is removed."
 
 (ert-deftest forth-parsing-words-font-lock ()
   (forth-assert-face "postpone ( →x " nil)
-  (forth-assert-face "' s\" →x "nil))
+  (forth-assert-face "' s\" →x "nil)
+  (forth-assert-face "case [char] ' →of exit endof " font-lock-keyword-face)
+  (forth-assert-face "→postpone postpone" font-lock-keyword-face)
+  (forth-assert-face "postpone →postpone" nil)
+  (forth-assert-face "→literal" font-lock-keyword-face)
+  (forth-assert-face "postpone →literal" nil)
+  (forth-assert-face "[ 48 ] →literal" font-lock-keyword-face)
+  (forth-assert-face "→: frob ;" font-lock-keyword-face)
+  (forth-assert-face ": →frob ;" font-lock-function-name-face)
+  (forth-assert-face "constant →foo" font-lock-function-name-face)
+  (forth-assert-face "create →foo" font-lock-function-name-face)
+  (forth-assert-face "value →foo" font-lock-function-name-face)
+  (forth-assert-face "variable →foo" font-lock-function-name-face)
+  (forth-assert-face "synonym →foo bar" font-lock-function-name-face))
 
 (ert-deftest forth-indent-colon-definition ()
   (forth-should-indent

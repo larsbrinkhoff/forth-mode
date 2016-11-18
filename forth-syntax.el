@@ -223,10 +223,13 @@ SYNTAX must be a valid argument for `string-to-syntax'."
 	   #'forth-syntax--state-eob)
 	  (t
 	   (forth-syntax--set-word-syntax start (point))
-	   (setq forth-syntax--current-word-start start)
-	   (let ((word (buffer-substring-no-properties start (point))))
-	     (or (forth-syntax--lookup word)
-		 #'forth-syntax--state-normal))))))
+	   (let* ((word (buffer-substring-no-properties start (point)))
+		  (parser (forth-syntax--lookup word)))
+	     (cond (parser
+		    (setq forth-syntax--current-word-start start)
+		    (funcall parser))
+		   (t
+		    #'forth-syntax--state-normal)))))))
 
 
 ;;; Guess initial state
@@ -262,9 +265,10 @@ SYNTAX must be a valid argument for `string-to-syntax'."
     (remove-text-properties start end '(font-lock-face))
     (let* ((guess (forth-syntax--guess-state start))
 	   (state (cdr guess)))
-      ;;(message "forth-syntax-propertize: %s %s %s" start end guess)
+      (message "forth-syntax-propertize: %s %s %s" start end guess)
       (goto-char (car guess))
       (while (< (point) end)
+	(message "forth-syntax-propertize2: %s %s" (point) state)
 	(let ((start (point)))
 	  (setq state (funcall state))
 	  (cl-assert (< start (point))))))))
