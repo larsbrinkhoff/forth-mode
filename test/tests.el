@@ -89,12 +89,12 @@ The whitespace before and including \"|\" on each line is removed."
 	(should (= (point) point-after))))))
 
 (ert-deftest forth-paren-comment-font-lock ()
-  (forth-assert-face "→( )" font-lock-comment-delimiter-face)
+  (forth-assert-face "→( )" font-lock-comment-face)
   (forth-assert-face "→.( )" font-lock-comment-face)
   (forth-assert-face "( →)" font-lock-comment-delimiter-face)
-  (forth-assert-face " →( )" font-lock-comment-delimiter-face)
-  (forth-assert-face "\t→( )" font-lock-comment-delimiter-face)
-  (forth-assert-face "→(\t)" font-lock-comment-delimiter-face)
+  (forth-assert-face " →( )" font-lock-comment-face)
+  (forth-assert-face "\t→( )" font-lock-comment-face)
+  (forth-assert-face "→(\t)" font-lock-comment-face)
   (forth-assert-face "(fo→o) " nil)
   (forth-assert-face "(fo→o)" nil)
   (forth-assert-face "(→) " nil)
@@ -257,3 +257,17 @@ The whitespace before and including \"|\" on each line is removed."
    "\\ foo bar baz→
    |: frob ( x y -- z ) ;"
    #'fill-paragraph))
+
+;; FIXME: maybe insert "(  )" instead of "()".
+(ert-deftest forth-comment-dwim ()
+  (forth-should-before/after
+   ": frob
+   |  begin     ( x y )
+   |    swap→
+   |  again ;"
+   ": frob
+   |  begin     ( x y )
+   |    swap    (→)
+   |  again ;"
+   (lambda ()
+     (call-interactively #'comment-dwim))))
