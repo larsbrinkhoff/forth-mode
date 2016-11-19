@@ -116,6 +116,10 @@
 	(comment-end ""))
     (apply #'fill-paragraph args)))
 
+(defun forth-beginning-of-defun (arg)
+  (and (re-search-backward "^\\s *: \\_<" nil t (or arg 1))
+       (beginning-of-line)))
+
 (unless (fboundp 'prog-mode)
   (defalias 'prog-mode 'fundamental-mode))
 
@@ -136,6 +140,7 @@
   (setq-local parse-sexp-lookup-properties t)
   (forth-smie-setup)
   (setq-local fill-paragraph-function #'forth-fill-paragraph)
+  (setq-local beginning-of-defun-function #'forth-beginning-of-defun)
   (setq-local comment-start-skip "\\(?:(\\*\\|\\\\\\) *")
   (setq-local comment-start "(")
   (setq-local comment-end ")")

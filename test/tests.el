@@ -258,6 +258,16 @@ The whitespace before and including \"|\" on each line is removed."
    |: frob ( x y -- z ) ;"
    #'fill-paragraph))
 
+(ert-deftest forth-beginning-of-defun ()
+  (forth-should-before/after
+   ": foo bar ;
+   |: baz ( x -- )
+   |  if foo→ then ;"
+   ": foo bar ;
+   |→: baz ( x -- )
+   |  if foo then ;"
+   #'beginning-of-defun))
+
 ;; FIXME: maybe insert "(  )" instead of "()".
 (ert-deftest forth-comment-dwim ()
   (forth-should-before/after
