@@ -8,15 +8,15 @@
 
 ;;; Helpers
 
-(defvar forth-syntax--whitespace " \t\n\f\r")
-(defvar forth-syntax--non-whitespace (concat "^" forth-syntax--whitespace))
+(defvar forth-syntax-whitespace " \t\n\f\r")
+(defvar forth-syntax-non-whitespace (concat "^" forth-syntax-whitespace))
 
 ;; Skip forward over whitespace and the following word. Return the
 ;; start position of the word.
 (defun forth-syntax--skip-word ()
-  (skip-chars-forward forth-syntax--whitespace)
+  (skip-chars-forward forth-syntax-whitespace)
   (let ((start (point)))
-    (skip-chars-forward forth-syntax--non-whitespace)
+    (skip-chars-forward forth-syntax-non-whitespace)
     start))
 
 ;; Return the whitespace-delimited word at position POS.
