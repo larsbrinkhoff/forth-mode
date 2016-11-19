@@ -88,7 +88,6 @@ The whitespace before and including \"|\" on each line is removed."
 	(should (string= after (substring-no-properties (buffer-string))))
 	(should (= (point) point-after))))))
 
-
 (defun forth-should-region-before/after (before after fun)
   (destructuring-bind (before start1 end1) (forth-strip-|-and-¹² before)
     (destructuring-bind (after point-after) (forth-strip-|-and-→ after)
@@ -102,18 +101,18 @@ The whitespace before and including \"|\" on each line is removed."
 
 (defmacro forth-with-gforth (&rest body)
   (declare (indent 0))
-  `(let* ((proc (get-buffer-process forth-interaction-buffer)))
+  `(let* ((forth-executable "gforth")
+	  (proc (get-buffer-process forth-interaction-buffer)))
      ;; FIXME: there should be a better way to do this. Probably a
      ;; callback function.
      (while (not (processp proc))
        (run-forth)
-       (message "Waiting for pforth to start ...")
+       (message "Waiting for gforth to start ...")
        (accept-process-output nil 0.3)
        (setq proc (get-buffer-process forth-interaction-buffer)))
      (unwind-protect
 	 (progn . ,body)
 	 (kill-process proc))))
->>>>>>> Test completion-at-point
 
 (ert-deftest forth-paren-comment-font-lock ()
   (forth-assert-face "→( )" font-lock-comment-delimiter-face)
@@ -345,7 +344,7 @@ The whitespace before and including \"|\" on each line is removed."
      (call-interactively #'comment-dwim))))
 
 (ert-deftest forth-completion-at-point ()
-  (forth-with-forth
+  (forth-with-gforth
     (forth-should-before/after
      "2C→"
      "2Constant→"
