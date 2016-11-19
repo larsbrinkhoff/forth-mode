@@ -59,7 +59,11 @@
 
 (defun forth-interaction-sentinel (proc arg)
   (message "Forth: %s" arg)
-  (comint-output-filter proc (format "\nForth: %s\n" arg)))
+  ;;FIXME: Can't do this because it calls process-mark, which
+  ;; errors out in killed processes.  Still, would be nice to see
+  ;; something in the *forth* buffer.
+  ;;(comint-output-filter proc (format "\nForth: %s\n" arg))
+  )
 
 (defvar forth-executable nil)
 
