@@ -65,13 +65,13 @@
 
 (defun forth-symbol-start ()
   (save-excursion
-    (re-search-backward "[^[:graph:]]")
-    (1+ (point))))
+    (skip-chars-backward forth-syntax-non-whitespace)
+    (point)))
 
 (defun forth-symbol-end ()
   (save-excursion
-    (re-search-forward "[^[:graph:]]")
-    (1- (point))))
+    (skip-chars-forward forth-syntax-non-whitespace)
+    (point)))
 
 (defun forth-word-at-point ()
   (buffer-substring (forth-symbol-start) (forth-symbol-end)))
