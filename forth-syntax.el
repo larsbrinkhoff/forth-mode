@@ -139,10 +139,10 @@ SYNTAX must be a valid argument for `string-to-syntax'."
 (defun forth-syntax--parse-comment (backward-regexp forward-regexp)
   (let ((pos (point)))
     (re-search-backward backward-regexp)
-    (forth-syntax--set-syntax (point) (1+ (point)) "<")
+    (forth-syntax--set-syntax (point) (1+ (point)) "!")
     (goto-char pos)
     (cond ((re-search-forward forward-regexp nil t)
-	   (forth-syntax--set-syntax (1- (point)) (point) ">")
+	   (forth-syntax--set-syntax (1- (point)) (point) "!")
 	   #'forth-syntax--state-normal)
 	  (t
 	   (goto-char (point-max))

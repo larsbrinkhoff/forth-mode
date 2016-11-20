@@ -40,9 +40,9 @@
 (defvar forth-mode-syntax-table
   (let ((table (make-syntax-table)))
     (modify-syntax-entry ?\\ "<" table)
-    (modify-syntax-entry ?\n " " table)
-    (modify-syntax-entry ?\( "!" table)
-    (modify-syntax-entry ?\) "_" table)
+    (modify-syntax-entry ?\n ">" table)
+    (modify-syntax-entry ?\( "<1b" table)
+    (modify-syntax-entry ?\) ">4b" table)
     (modify-syntax-entry ?* "_23n" table)
     (modify-syntax-entry ?\{ "_" table)
     (modify-syntax-entry ?\} "_" table)
@@ -112,9 +112,14 @@
 (defun forth-fill-paragraph (&rest args)
   (let ((fill-paragraph-function nil)
 	(fill-paragraph-handle-comment t)
-	(comment-start "\ ")
+	(comment-start "\\ ")
 	(comment-end ""))
     (apply #'fill-paragraph args)))
+
+(defun forth-comment-region (&rest args)
+  (let ((comment-start "\\ ")
+	(comment-end ""))
+    (apply #'comment-region-default args)))
 
 (defun forth-beginning-of-defun (arg)
   (and (re-search-backward "^\\s *: \\_<" nil t (or arg 1))
@@ -141,9 +146,10 @@
   (forth-smie-setup)
   (setq-local fill-paragraph-function #'forth-fill-paragraph)
   (setq-local beginning-of-defun-function #'forth-beginning-of-defun)
-  (setq-local comment-start-skip "\\(?:(\\*\\|\\\\\\) *")
+  (setq-local comment-start-skip "\\(?:([*]?\\|\\\\\\) *")
   (setq-local comment-start "(")
   (setq-local comment-end ")")
+  (setq-local comment-region-function #'forth-comment-region)
   (setq imenu-generic-expression
 	'(("Words"
 	   "^\\s-*\\(:\\|code\\|defer\\)\\s-+\\(\\(\\sw\\|\\s_\\)+\\)" 2)
