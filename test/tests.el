@@ -88,13 +88,24 @@ The whitespace before and including \"|\" on each line is removed."
 	(should (string= after (substring-no-properties (buffer-string))))
 	(should (= (point) point-after))))))
 
+(defun forth-should-region-before/after (before after fun)
+  (destructuring-bind (before start1 end1) (forth-strip-|-and-¹² before)
+    (destructuring-bind (after point-after) (forth-strip-|-and-→ after)
+      (forth-with-temp-buffer before
+	(set-mark start1)
+	(goto-char end1)
+	(activate-mark)
+	(funcall fun)
+	(should (string= after (substring-no-properties (buffer-string))))
+	(should (= (point) point-after))))))
+
 (ert-deftest forth-paren-comment-font-lock ()
-  (forth-assert-face "→( )" font-lock-comment-face)
+  (forth-assert-face "→( )" font-lock-comment-delimiter-face)
   (forth-assert-face "→.( )" font-lock-comment-face)
   (forth-assert-face "( →)" font-lock-comment-delimiter-face)
-  (forth-assert-face " →( )" font-lock-comment-face)
-  (forth-assert-face "\t→( )" font-lock-comment-face)
-  (forth-assert-face "→(\t)" font-lock-comment-face)
+  (forth-assert-face " →( )" font-lock-comment-delimiter-face)
+  (forth-assert-face "\t→( )" font-lock-comment-delimiter-face)
+  (forth-assert-face "→(\t)" font-lock-comment-delimiter-face)
   (forth-assert-face "(fo→o) " nil)
   (forth-assert-face "(fo→o)" nil)
   (forth-assert-face "(→) " nil)
@@ -279,5 +290,31 @@ The whitespace before and including \"|\" on each line is removed."
    |  begin     ( x y )
    |    swap    (→)
    |  again ;"
+   (lambda ()
+     (call-interactively #'comment-dwim)))
+  (forth-should-region-before/after
+   "²: frob
+   |  begin     ( x y )
+   |    swap
+   |  again ;
+   |¹"
+   "→\\ : frob
+   |\\   begin     ( x y )
+   |\\     swap
+   |\\   again ;
+   |"
+   (lambda ()
+     (call-interactively #'comment-dwim)))
+  (forth-should-region-before/after
+   "¹\\ : frob
+   |\\   begin     ( x y )
+   |\\     swap
+   |\\   again ;
+   |²"
+   ": frob
+   |  begin     ( x y )
+   |    swap
+   |  again ;
+   |→"
    (lambda ()
      (call-interactively #'comment-dwim))))
