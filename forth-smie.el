@@ -32,7 +32,8 @@
   (pcase (cons kind token)
     (`(:elem . basic) forth-smie--basic-indent)
     (`(:elem . args) 0)
-    (`(:list-intro . ,_) forth-smie--basic-indent)))
+    (`(:list-intro . ,_) forth-smie--basic-indent)
+    (_ nil)))
 
 (defun forth-smie--forward-token ()
   (forward-comment (point-max))

@@ -114,12 +114,12 @@ The whitespace before and including \"|\" on each line is removed."
                         →x y )" font-lock-comment-face))
 
 (ert-deftest forth-backslash-comment-font-lock ()
-  (forth-assert-face "→\\" font-lock-comment-delimiter-face)
+  (forth-assert-face "→\\" font-lock-comment-face)
   (forth-assert-face "→\\ " font-lock-comment-delimiter-face)
-  (forth-assert-face " →\\" font-lock-comment-delimiter-face)
+  (forth-assert-face " →\\" font-lock-comment-face)
   (forth-assert-face "\t→\\ " font-lock-comment-delimiter-face)
   (forth-assert-face " →\\\t" font-lock-comment-delimiter-face)
-  (forth-assert-face " →\\\n" font-lock-comment-delimiter-face)
+  (forth-assert-face " →\\\n" font-lock-comment-face)
   (forth-assert-face "a→\\b" nil)
   (forth-assert-face "a→\\b " nil))
 
@@ -242,6 +242,15 @@ The whitespace before and including \"|\" on each line is removed."
    |  drop exit
    |endcase"))
 
+;; This is an tricky case because SMIE thinks, depending on
+;; `comment-start-skip` (which indirectly depends on `comment-start`
+;; thru `comment-normalize-vars`), that (foo) is a comment.  But since
+;; (foo) is not actually a comment this leads to an endless recursion.
+(ert-deftest forth-indent-\(foo\) ()
+  (forth-should-indent
+   ": foo
+   |  (foo) ;"))
+
 (ert-deftest forth-sexp-movements ()
   (forth-assert-forward-sexp " ¹: foo bar ;² \ x")
   (forth-assert-forward-sexp " ¹:noname foo bar ;² \ x")
@@ -288,7 +297,7 @@ The whitespace before and including \"|\" on each line is removed."
    |  again ;"
    ": frob
    |  begin     ( x y )
-   |    swap    (→)
+   |    swap    ( → )
    |  again ;"
    (lambda ()
      (call-interactively #'comment-dwim)))
