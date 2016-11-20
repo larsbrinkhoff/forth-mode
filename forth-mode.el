@@ -146,9 +146,9 @@
   (forth-smie-setup)
   (setq-local fill-paragraph-function #'forth-fill-paragraph)
   (setq-local beginning-of-defun-function #'forth-beginning-of-defun)
-  (setq-local comment-start-skip "\\(?:([*]?\\|\\\\\\) *")
-  (setq-local comment-start "(")
-  (setq-local comment-end ")")
+  (setq-local comment-start-skip "[(\\][ \t*]+")
+  (setq-local comment-start "( ")
+  (setq-local comment-end " )")
   (setq-local comment-region-function #'forth-comment-region)
   (setq imenu-generic-expression
 	'(("Words"
