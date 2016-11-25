@@ -3,7 +3,9 @@ build:
     steps:
         - script:
             name: install
-            code: apt-get update && apt-get install make
+            code: |
+	        apt-get update && apt-get install make
+		apt-get install gforth || true
         - script:
             name: build23
             code: make clean && make EMACS=/usr/local/emacs-23.4/bin/emacs
