@@ -23,6 +23,7 @@
   (should-not (string-match "failed" (byte-recompile-directory "." 0))))
 
 (load-file "test/tests.el")
+(setq forth-executable (getenv "FORTH"))
 
 ;;; Ensure compile-package is run first.
 (ert-run-tests-batch-and-exit '(or compile-package t))
