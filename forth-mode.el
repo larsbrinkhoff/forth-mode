@@ -83,7 +83,12 @@
 	(when (listp (rest index))
 	  (dolist (def (rest index))
 	    (push (car def) list)))))
-    (list (forth-symbol-start) (forth-symbol-end) list)))
+    (list (forth-symbol-start) (forth-symbol-end)
+	  ;; FIXME: this should use `completion-table-case-fold' or
+	  ;; closures but neither is available in Emacs23.
+	  `(lambda (string pred action)
+	     (let ((completion-ignore-case t))
+	       (complete-with-action action ',list string pred))))))
 
 (defun forth-block-with-newlines-p ()
   (save-excursion
