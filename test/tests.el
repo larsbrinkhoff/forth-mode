@@ -345,6 +345,6 @@ The whitespace before and including \"|\" on each line is removed."
 (ert-deftest forth-completion-at-point ()
   (forth-with-forth
     (forth-should-before/after
-     "2C→"
+     "2c→"
      "2Constant→"
      #'completion-at-point)))
