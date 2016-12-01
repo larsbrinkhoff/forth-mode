@@ -265,6 +265,13 @@ The whitespace before and including \"|\" on each line is removed."
    ": foo
    |  (foo) ;"))
 
+(ert-deftest forth-indent-structure ()
+  (forth-should-indent
+   "BEGIN-STRUCTURE point
+   |  1 CELLS +FIELD p.x
+   |  1 CELLS +FIELD p.y
+   |END-STRUCTURE"))
+
 (ert-deftest forth-sexp-movements ()
   (forth-assert-forward-sexp " ¹: foo bar ;² \ x")
   (forth-assert-forward-sexp " ¹:noname foo bar ;² \ x")
