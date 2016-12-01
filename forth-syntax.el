@@ -203,7 +203,8 @@ SYNTAX must be a valid argument for `string-to-syntax'."
     "case" "of" "endof" "endcase"
     ":noname" ";" "does>" "immediate"
     "is" "to"
-    "literal" "2literal" "fliteral" "sliteral"))
+    "literal" "2literal" "fliteral" "sliteral"
+    "begin-structure" "end-structure"))
 
 (dolist (w forth-syntax--parsing-words)
   (forth-syntax--define w #'forth-syntax--state-parsing-word))
