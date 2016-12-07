@@ -188,7 +188,13 @@ The whitespace before and including \"|\" on each line is removed."
   (forth-should-indent
    ": foo ( x y -- y x )
    |  swap
-   |;"))
+   |;")
+  ;; Open Firmware style
+  (let ((forth-smie-basic-indent 3))
+    (forth-should-indent
+     ": foo ( x y -- y x )
+     |   swap
+     |;")))
 
 (ert-deftest forth-indent-if-then-else ()
   (forth-should-indent
