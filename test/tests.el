@@ -278,6 +278,13 @@ The whitespace before and including \"|\" on each line is removed."
    |  1 CELLS +FIELD p.y
    |END-STRUCTURE"))
 
+(ert-deftest forth-indent-noname ()
+  (forth-should-indent
+   "1 2 :noname
+   |      swap
+   |    ;
+   |execute"))
+
 (ert-deftest forth-sexp-movements ()
   (forth-assert-forward-sexp " ¹: foo bar ;² \ x")
   (forth-assert-forward-sexp " ¹:noname foo bar ;² \ x")
