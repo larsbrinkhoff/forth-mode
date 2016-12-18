@@ -2,6 +2,11 @@
 
 (require 'smie)
 
+(defcustom forth-smie-basic-indent 2
+  "Basic amount of indentation."
+  :type 'integer
+  :group 'forth-smie)
+
 (defvar forth-smie--grammar
   (smie-prec2->grammar
    (smie-bnf->prec2
@@ -21,8 +26,6 @@
        (":" words ";")
        (":noname" words ";"))
       (words)))))
-
-(defvar forth-smie-basic-indent 2)
 
 (unless (fboundp 'pcase)
   (defmacro pcase (form &rest forms)
