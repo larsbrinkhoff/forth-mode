@@ -5,7 +5,8 @@
 (defcustom forth-smie-basic-indent 2
   "Basic amount of indentation."
   :type 'integer
-  :group 'forth-smie)
+  :group 'forth-smie
+  :safe 'integerp)
 
 (defvar forth-smie--grammar
   (smie-prec2->grammar
