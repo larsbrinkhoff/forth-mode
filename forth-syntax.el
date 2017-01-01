@@ -198,7 +198,7 @@ SYNTAX must be a valid argument for `string-to-syntax'."
 
 (defvar forth-syntax--font-lock-keywords
   '("if" "else" "then"
-    "?do" "do" "unloop" "exit" "loop" "+loop"
+    "?do" "do" "unloop" "exit" "leave" "loop" "+loop"
     "begin" "while" "repeat" "again" "until"
     "case" "of" "endof" "endcase"
     ":noname" ";" "does>" "immediate"
