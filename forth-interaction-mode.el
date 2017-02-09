@@ -99,7 +99,7 @@
   (run-forth))
 
 (defun forth-ensure ()
-  (unless forth-interaction-buffer
+  (unless (buffer-live-p forth-interaction-buffer)
     (run-forth))
   (get-buffer-process forth-interaction-buffer))
 
