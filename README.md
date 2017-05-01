@@ -25,7 +25,7 @@ Manual:
     git clone http://github.com/larsbrinkhoff/forth-mode DIR
     
     # Add to .emacs
-    (pushnew "DIR" load-path)
+    (add-to-list 'load-path "DIR")
     (require 'forth-mode)
     (require 'forth-block-mode)
     (require 'forth-interaction-mode)
