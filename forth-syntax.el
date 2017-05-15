@@ -194,7 +194,9 @@ SYNTAX must be a valid argument for `string-to-syntax'."
   '(":" "create" "synonym" "defer" "code"
     "constant" "2constant" "fconstant"
     "value" "2value" "fvalue"
-    "variable" "2variable" "fvariable"))
+    "variable" "2variable" "fvariable"
+    "+field" "field:" "cfield:" "ffield:" "sffield:" "dffield:"
+    ))
 
 (defvar forth-syntax--font-lock-keywords
   '("if" "else" "then"
