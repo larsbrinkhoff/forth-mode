@@ -4,6 +4,7 @@
 (require 'forth-mode)
 
 (defvar forth-interaction-buffer nil)
+(defvar forth-interaction-source-buffer nil)
 (defvar forth-interaction-callback nil)
 (defvar forth-words-cache nil)
 (defvar forth-implementation nil)
@@ -23,6 +24,7 @@
   (let ((map (copy-keymap forth-mode-map)))
     (set-keymap-parent map comint-mode-map)
     (define-key map (kbd "C-c C-r") 'forth-restart)
+    (define-key map (kbd "C-c C-z") 'forth-switch-to-source-buffer)
     map)
   "Keymap for Forth interaction.")
 
@@ -179,12 +181,28 @@
       (insert (forth-interaction-send "see " word)))
     (special-mode)))
 
+(defun forth-switch-to-buffer (buffer)
+  ;; If buffer is visible, switch to that window.  Otherwise, display
+  ;; buffer in current window.
+  (select-window (display-buffer buffer
+				 '((display-buffer-reuse-window
+				    display-buffer-same-window)))))
+
 ;;;###autoload
 (defun forth-switch-to-output-buffer ()
   (interactive)
   (if forth-interaction-buffer
-      (switch-to-buffer forth-interaction-buffer)
+      (progn
+	(setq forth-interaction-source-buffer (current-buffer))
+	(forth-switch-to-buffer forth-interaction-buffer))
       (message "Forth not started.")))
+
+;;;###autoload
+(defun forth-switch-to-source-buffer ()
+  (interactive)
+  (if forth-interaction-source-buffer
+      (forth-switch-to-buffer forth-interaction-source-buffer)
+    (message "Don't know which buffer to switch to.")))
 
 ;;;###autoload
 (defun forth-eval-last-expression ()
