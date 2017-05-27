@@ -171,6 +171,7 @@ The whitespace before and including \"|\" on each line is removed."
   (forth-assert-face "postpone ( →x " nil)
   (forth-assert-face "' s\" →x "nil)
   (forth-assert-face "case [char] ' →of exit endof " font-lock-keyword-face)
+  (forth-assert-face "case [char] ' →?of exit endof " font-lock-keyword-face)
   (forth-assert-face "→postpone postpone" font-lock-keyword-face)
   (forth-assert-face "postpone →postpone" nil)
   (forth-assert-face "→literal" font-lock-keyword-face)
@@ -257,6 +258,9 @@ The whitespace before and including \"|\" on each line is removed."
    |    foo
    |  endof
    |  [char] b of bar
+   |              baz
+   |           endof
+   |  foo bar wibble ?of bar
    |              baz
    |           endof
    |  drop exit

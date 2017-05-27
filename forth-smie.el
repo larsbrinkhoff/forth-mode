@@ -17,6 +17,7 @@
        ("begin" words "while" words "repeat")
        ("begin" words "until")
        ("begin" words "again")
+       ("?of" words "endof")
        ("of" words "endof")
        ("case" words "endcase")
        ("?do" words "loop")
