@@ -260,9 +260,9 @@ The whitespace before and including \"|\" on each line is removed."
    |  [char] b of bar
    |              baz
    |           endof
-   |  foo bar wibble ?of bar
-   |              baz
-   |           endof
+   |  test ?of bar
+   |           baz
+   |       endof
    |  drop exit
    |endcase"))
 
