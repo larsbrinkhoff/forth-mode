@@ -23,7 +23,7 @@
 (defvar forth-interaction-mode-map
   (let ((map (copy-keymap forth-mode-map)))
     (set-keymap-parent map comint-mode-map)
-    (define-key map (kbd "C-c C-r") 'forth-restart)
+    (define-key map (kbd "C-c C-f") 'forth-restart)
     (define-key map (kbd "C-c C-z") 'forth-switch-to-source-buffer)
     map)
   "Keymap for Forth interaction.")
