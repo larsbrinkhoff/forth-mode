@@ -11,6 +11,8 @@
 (defvar forth-banner "")
 (defvar forth-backend-dir
   (concat (file-name-directory load-file-name) "backend"))
+(defvar forth-go-to-interaction-buffer-after-eval nil)
+
 
 (defvar forth-implementation-matches
   '(("Gforth" . gforth)
@@ -223,7 +225,9 @@
 	  (forward-sexp)
 	  (let ((string (buffer-substring start (point))))
 	    (forth-switch-to-output-buffer)
-	    (insert (forth-interaction-send string)))))
+	    (insert (forth-interaction-send string))
+	    (unless forth-go-to-interaction-buffer-after-eval
+	      (forth-switch-to-source-buffer)))))
       (message "Forth not started.")))
 
 (provide 'forth-interaction-mode)
