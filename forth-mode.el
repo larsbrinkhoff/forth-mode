@@ -61,6 +61,49 @@
     (modify-syntax-entry ?\" "\"" table)
     table))
 
+;; forth-menu-entries:
+;; In the list,  the three elements are
+;; 1. menu name (internal)
+;; 2. menu string (shown to the user)
+;; 3. function name (to be called whe this menu entry iss
+;;    clicked on
+(defvar forth-menu-entries
+  (reverse (list
+	    '(see          "See"                   forth-see)
+	    '(eval         "Eval"                  forth-eval)
+	    '(eval-defun   "Eval defun"            forth-eval-defun)
+	    '(eval-region  "Eval region"           forth-eval-region)
+	    '(eval-last    "Eval last"             forth-eval-last-expression)
+	    '(eval-display "Eval last and display" forth-eval-last-expression-display-output)
+	    '(separator1   "--")
+	    '(lookup-1994  "Lookup 1994 spec"      forth-spec-lookup-1994)
+	    '(lookup-2012  "Lookup-2012 spec"      forth-spec-lookup-2012)
+	    '(separator2   "--")
+	    '(load-file    "Load file"             forth-load-file)
+	    '(run          "Run Forth"             run-forth)
+	    '(kill         "Kill"                  forth-kill))))
+
+;; forth-create-menu will actually call define-key to
+;; add meu entries. The format is that of the variable
+;; forth-menu-entries.
+(defun forth-create-menu (entries)
+  (mapcar (lambda (entry)
+	     (let ((menu-name (first entry))
+		   (menu-string (second entry))
+		   (menu-function (third entry)))
+		  (define-key forth-mode-map
+		    (vector 'menu-bar 'forth menu-name)
+		    (cons menu-string menu-function))))
+	  entries))
+
+(defun forth-mode-init-menu ()
+  (define-key-after
+    forth-mode-map
+    [menu-bar forth]
+    (cons "Forth" (make-sparse-keymap "Forth"))
+    'tools)
+  (forth-create-menu forth-menu-entries))
+
 (defvar forth-mode-hook)
 
 (defun forth-symbol-start ()
@@ -161,7 +204,8 @@
 	  ("Variables"
 	   "^\\s-*2?\\(variable\\|create\\|value\\)\\s-+\\(\\(\\sw\\|\\s_\\)+\\)" 2)
 	  ("Constants"
-	   "\\s-2?constant\\s-+\\(\\(\\sw\\|\\s_\\)+\\)" 1))))
+	   "\\s-2?constant\\s-+\\(\\(\\sw\\|\\s_\\)+\\)" 1))) 
+  (forth-mode-init-menu))
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.\\(f\\|fs\\|fth\\|4th\\)\\'" . forth-mode))
@@ -179,6 +223,8 @@
 
 (defun forth-beginning ()
   (goto-char (point-min)))
+
+(add-hook 'forth-mode-hook 'forth-mode-init-menu)
 
 (provide 'forth-mode)
 ;;; forth-mode.el ends here
