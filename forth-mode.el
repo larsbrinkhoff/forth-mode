@@ -16,6 +16,7 @@
 (require 'forth-syntax)
 (require 'forth-smie)
 (require 'forth-spec)
+(require 'forth-mode-version)
 
 (defvar forth-mode-map
   (let ((map (make-sparse-keymap)))
@@ -83,7 +84,15 @@
 	    '(load-file    "Load file"             forth-load-file)
 	    '(run          "Run Forth"             run-forth)
 	    '(restart      "Restart Forth"         forth-restart)
-	    '(kill         "Kill"                  forth-kill))))
+	    '(kill         "Kill"                  forth-kill)
+            '(version      "Show version"          forth-show-mode-version))))
+
+(defun forth-show-mode-version ()
+  (interactive)
+  (let ((help-window-select t))
+    (with-help-window "*forth-mode-about*"
+      (princ (concat "Version of forth-mode: " forth-mode-version)))))
+
 
 ;; forth-create-menu will actually call define-key to
 ;; add meu entries. The format is that of the variable
