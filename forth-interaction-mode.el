@@ -25,6 +25,7 @@
     (set-keymap-parent map comint-mode-map)
     (define-key map (kbd "C-c C-r") 'forth-restart)
     (define-key map (kbd "C-c C-z") 'forth-switch-to-source-buffer)
+    (define-key map (kbd ":") 'forth-insert-colon)
     map)
   "Keymap for Forth interaction.")
 
@@ -225,5 +226,29 @@
 	    (forth-switch-to-output-buffer)
 	    (insert (forth-interaction-send string)))))
       (message "Forth not started.")))
+
+
+;; A work-around of a bug in `matching-paren' which fails to detect the closing char for ";" in the forth-interaction-buffer, which propagates to `electric-pair-syntax-info' inserting ":" instead of the expected ";" char:
+(require 'cl-lib)
+(defun forth-insert-colon (&optional ntimes)
+  "Insert : correctly insert the closing char (the semi-colon ';') if `electric-pair-mode' or `electric-pair-local-mode' is on.
+NTIMES: the number of times to insert this character ':'."
+  (interactive "p")
+  (cl-flet ((eol-length
+             ()
+             (- (line-end-position) (point))))
+    (let* ((eol-length_0 (funcall #'eol-length))
+           (point_0 (point)))
+      (self-insert-command ntimes)
+      (and ; if 2 chars have just been inserted in the current line:
+       (eq 1 (- (funcall #'eol-length) eol-length_0))
+       ;; and point is after the first inserted char:
+       (eq (point) (+ point_0 ntimes))
+       ;; and the 2nd inserted char is not ';':
+       (not (eq ?\; (char-after)))
+       (progn
+         (delete-char 1)
+         (insert-char ?\;)
+         (backward-char))))))
 
 (provide 'forth-interaction-mode)
