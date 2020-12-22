@@ -91,13 +91,13 @@ End the interactive Forth session.
 @item C-c :
 @itemx M-x forth-eval
 
-Enter a string to evalutaion.  The output, if any, is printed in the
+Enter a string to evaluation.  The output, if any, is printed in the
 minibuffer.
 
 @item C-c C-r
 @itemx M-x forth-eval-region
 
-Evalutate the current region.  The output, if any, is printed in the
+Evaluate the current region.  The output, if any, is printed in the
 minibuffer.
 
 @item C-c C-e
@@ -115,7 +115,7 @@ the interactive Forth session.
 @item C-M-x
 @itemx M-x forth-eval-defun
 
-Evalutate the colon definition under point.  The output, if any, is
+Evaluate the colon definition under point.  The output, if any, is
 printed in the minibuffer.
 
 @item C-c C-l
