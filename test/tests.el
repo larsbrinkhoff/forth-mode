@@ -302,10 +302,7 @@ The whitespace before and including \"|\" on each line is removed."
 
 (ert-deftest forth-spec-parsing ()
   (should (equal (forth-spec--build-url "SWAP" 1994)
-		 "http://lars.nocrew.org/dpans/dpans6.htm#6.1.2260"))
-  (should
-   (equal (forth-spec--build-url "SWAP" 2012)
-	  "http://www.forth200x.org/documents/html/core.html#core:SWAP")))
+		 "http://lars.nocrew.org/dpans/dpans6.htm#6.1.2260")))
 
 (ert-deftest forth-fill-comment ()
   (forth-should-before/after
