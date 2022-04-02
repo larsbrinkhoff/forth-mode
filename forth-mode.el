@@ -221,6 +221,7 @@
     (speedbar-add-supported-extension ".f")
     (speedbar-add-supported-extension ".fs")
     (speedbar-add-supported-extension ".fth")
+    (speedbar-add-supported-extension ".forth")
     (speedbar-add-supported-extension ".4th")))
 
 (defun forth-beginning ()
