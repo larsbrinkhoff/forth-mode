@@ -1,3 +1,10 @@
+(require 'forth-mode)
+(require 'forth-interaction-mode)
+(require 'forth-block-mode)
+
+(unless forth-executable
+  (setq forth-executable (getenv "FORTH")))
+
 (ert-deftest load-not-block ()
   (find-file "test/noblock.fth")
   (should (eq major-mode 'forth-mode))
