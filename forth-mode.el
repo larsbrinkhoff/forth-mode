@@ -193,6 +193,7 @@
   (when (boundp 'syntax-propertize-function)
     (setq-local syntax-propertize-function #'forth-syntax-propertize))
   (setq-local parse-sexp-lookup-properties t)
+  (hack-local-variables)
   (forth-smie-setup)
   (setq-local fill-paragraph-function #'forth-fill-paragraph)
   (setq-local beginning-of-defun-function #'forth-beginning-of-defun)

@@ -8,26 +8,47 @@
   :group 'forth-smie
   :safe 'integerp)
 
-(defvar forth-smie--grammar
+(defcustom forth-smie-bnf-extensions '()
+  "Rules for non-standard syntax.
+
+We add this list of BNF rules to the default rules to support
+user defined syntax.  E.g., setting this variable to
+
+  '((gforth-ext (\"?of\" words \"endof\")))
+
+tells Emacs to recognize ?OF ... ENDOF as a matching pair of tokens.
+
+This variable can also be set in .dir-locals.el, e.g.:
+
+  ((forth-mode . ((forth-smie-bnf-extensions
+		 . ((my-stuff (\"import\" words \"{\" words \"}\"))))))).
+"
+  :type '(alist :key-type symbol :value-type (list (list string symbol)))
+  :group 'forth-smie
+  :safe 'listp)
+
+(defconst forth-smie--bnf
+  '((control
+     ("if" words "else" words "then")
+     ("if" words "then")
+     ("begin" words "while" words "repeat")
+     ("begin" words "until")
+     ("begin" words "again")
+     ("of" words "endof")
+     ("case" words "endcase")
+     ("?do" words "loop")
+     ("?do" words "+loop")
+     ("do" words "loop")
+     ("do" words "+loop")
+     ("begin-structure" words "end-structure")
+     (":" words ";")
+     (":noname" words ";"))
+    (words)))
+
+(defun forth-smie--grammar ()
   (smie-prec2->grammar
-   (smie-bnf->prec2
-    '((control
-       ("if" words "else" words "then")
-       ("if" words "then")
-       ("begin" words "while" words "repeat")
-       ("begin" words "until")
-       ("begin" words "again")
-       ("?of" words "endof")
-       ("of" words "endof")
-       ("case" words "endcase")
-       ("?do" words "loop")
-       ("?do" words "+loop")
-       ("do" words "loop")
-       ("do" words "+loop")
-       ("begin-structure" words "end-structure")
-       (":" words ";")
-       (":noname" words ";"))
-      (words)))))
+   (smie-bnf->prec2 (append forth-smie--bnf
+			    forth-smie-bnf-extensions))))
 
 (unless (fboundp 'pcase)
   (defmacro pcase (form &rest forms)
@@ -69,7 +90,7 @@
 		    (point)))))
 
 (defun forth-smie-setup ()
-  (smie-setup forth-smie--grammar #'forth-smie--indentation-rules
+  (smie-setup (forth-smie--grammar) #'forth-smie--indentation-rules
 	      :forward-token #'forth-smie--forward-token
 	      :backward-token #'forth-smie--backward-token))
 
