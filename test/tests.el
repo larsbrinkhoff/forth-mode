@@ -120,6 +120,22 @@ The whitespace before and including \"|\" on each line is removed."
 	 (progn . ,body)
 	 (kill-process proc))))
 
+(defun forth-assert-backward-token (content token)
+  (cl-destructuring-bind (content pos1 pos2) (forth-strip-|-and-¹² content)
+    (forth-with-temp-buffer content
+      (goto-char pos1)
+      (let ((token2 (forth-smie--backward-token)))
+	(should (equal token2 token))
+	(should (= (point) pos2))))))
+
+(defun forth-assert-forward-token (content token)
+  (cl-destructuring-bind (content pos1 pos2) (forth-strip-|-and-¹² content)
+    (forth-with-temp-buffer content
+      (goto-char pos1)
+      (let ((token2 (forth-smie--forward-token)))
+	(should (equal token2 token))
+	(should (= (point) pos2))))))
+
 (ert-deftest forth-paren-comment-font-lock ()
   (forth-assert-face "→( )" font-lock-comment-delimiter-face)
   (forth-assert-face "→.( )" font-lock-comment-face)
@@ -306,10 +322,44 @@ The whitespace before and including \"|\" on each line is removed."
    |    ;
    |execute"))
 
+(ert-deftest forth-indent-postpone ()
+  (forth-should-indent
+   ": foo
+   |  postpone :
+   |  42 postpone literal
+   |  postpone ;
+   |;")
+  (forth-should-indent
+   ": foo
+   |  POSTPONE :
+   |  42 POSTPONE literal
+   |  postpone ;
+   |;")
+  (forth-should-indent
+   ": foo
+   |  postpone if
+   |  if
+   |    postpone then
+   |  else
+   |    postpone then
+   |  then
+   |;")
+  (forth-should-indent
+   ": foo
+   |  ['] :
+   |  if
+   |    postpone ;
+   |  else
+   |    postpone recurse postpone ;
+   |  then
+   |;")
+  )
+
 (ert-deftest forth-sexp-movements ()
   (forth-assert-forward-sexp " ¹: foo bar ;² \ x")
   (forth-assert-forward-sexp " ¹:noname foo bar ;² \ x")
-  (forth-assert-forward-sexp " ¹if drop exit else 1+ then² bar "))
+  (forth-assert-forward-sexp " ¹if drop exit else 1+ then² bar ")
+  (forth-assert-forward-sexp " : foo ¹postpone if² postpone then ;"))
 
 ;; IDEA: give the filename in "include filename" string syntax.
 (ert-deftest forth-word-movements ()
@@ -386,3 +436,31 @@ The whitespace before and including \"|\" on each line is removed."
      "2c→"
      "2Constant→"
      #'completion-at-point)))
+
+(ert-deftest forth-smie-backward-token ()
+  (forth-assert-backward-token "²foo¹" "foo")
+  (forth-assert-backward-token "²foo-bar¹" "foo-bar")
+  (forth-assert-backward-token "  ²foo-bar  ¹baz" "foo-bar")
+  (forth-assert-backward-token " ²?#!-+  ¹" "?#!-+")
+  (forth-assert-backward-token " ²foo ( x y ) ¹" "foo")
+  (forth-assert-backward-token " foo \ x ²y  ¹" "y")
+  (forth-assert-backward-token " ²postpone foo¹" '("postpone" "foo"))
+  (forth-assert-backward-token " ²[']   foo ¹" '("[']" "foo"))
+  (forth-assert-backward-token " ²[char]  : ¹" '("[char]" ":"))
+  ;; We're mostly interested in getting indentation inside colon
+  ;; definitions right, so here we don't treat ' as parsing word.
+  (forth-assert-backward-token " ' ²foo¹" "foo")
+  (forth-assert-backward-token " : ²foo¹" "foo"))
+
+(ert-deftest forth-smie-forward-token ()
+  (forth-assert-forward-token "¹foo²" "foo")
+  (forth-assert-forward-token "¹foo-bar²" "foo-bar")
+  (forth-assert-forward-token "  ¹foo-bar²  baz" "foo-bar")
+  (forth-assert-forward-token " ¹?#!-+²  " "?#!-+")
+  (forth-assert-forward-token " ¹foo² ( x y )" "foo")
+  (forth-assert-forward-token " foo \ x ¹y² " "y")
+  (forth-assert-forward-token " ¹postpone foo²" '("postpone" "foo"))
+  (forth-assert-forward-token " ¹ [']   foo² " '("[']" "foo"))
+  (forth-assert-forward-token " ¹[char]  :² " '("[char]" ":"))
+  (forth-assert-forward-token " ¹'² foo" "'")
+  (forth-assert-forward-token " ¹:² foo" ":"))

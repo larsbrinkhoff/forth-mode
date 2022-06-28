@@ -75,19 +75,43 @@ This variable can also be set in .dir-locals.el, e.g.:
     (`(:list-intro . ,_) t)
     (_ nil)))
 
+(defconst forth-smie--parsing-word-regexp
+  (eval-when-compile
+    (concat "^"
+	    (regexp-opt '("postpone" "[']" "[char]"))
+	    "$")))
+
+(defun forth-smie--forward-word ()
+  (let* ((start (progn (skip-syntax-forward " ") (point)))
+	 (end (progn (skip-syntax-forward "w_") (point))))
+    (buffer-substring-no-properties start end)))
+
+(defun forth-smie--backward-word ()
+  (let* ((end (progn (skip-syntax-backward " ") (point)))
+	 (start (progn (skip-syntax-backward "w_") (point))))
+    (buffer-substring-no-properties start end)))
+
 (defun forth-smie--forward-token ()
   (forward-comment (point-max))
-  (downcase (buffer-substring-no-properties
-	     (point)
-	     (progn (skip-syntax-forward "w_")
-		    (point)))))
+  (let* ((word1 (downcase (forth-smie--forward-word)))
+	 (pos1 (point))
+	 (word2 (downcase (forth-smie--forward-word))))
+    (cond ((string-match forth-smie--parsing-word-regexp word1)
+	   (list word1 word2))
+	  (t
+	   (goto-char pos1)
+	   word1))))
 
 (defun forth-smie--backward-token ()
   (forward-comment (- (point)))
-  (downcase (buffer-substring-no-properties
-	     (point)
-	     (progn (skip-syntax-backward "w_")
-		    (point)))))
+  (let* ((word1 (downcase (forth-smie--backward-word)))
+	 (pos1 (point))
+	 (word2 (downcase (forth-smie--backward-word))))
+    (cond ((string-match forth-smie--parsing-word-regexp word2)
+	   (list word2 word1))
+	  (t
+	   (goto-char pos1)
+	   word1))))
 
 (defun forth-smie-setup ()
   (smie-setup (forth-smie--grammar) #'forth-smie--indentation-rules
