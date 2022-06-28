@@ -52,7 +52,7 @@
 
 (defun forth-assert-face (content face)
   (when (boundp 'syntax-propertize-function)
-    (destructuring-bind (content pos) (forth-strip-|-and-→ content)
+    (cl-destructuring-bind (content pos) (forth-strip-|-and-→ content)
       (forth-with-temp-buffer content
 	(font-lock-ensure)
 	(should (eq face (or (get-text-property pos 'face)
@@ -72,14 +72,14 @@ The whitespace before and including \"|\" on each line is removed."
 			 (substring-no-properties (buffer-string))))))))
 
 (defun forth-assert-forward-sexp (content)
-  (destructuring-bind (content start end) (forth-strip-|-and-¹² content)
+  (cl-destructuring-bind (content start end) (forth-strip-|-and-¹² content)
     (forth-with-temp-buffer content
       (goto-char start)
       (forward-sexp)
       (should (= (point) end)))))
 
 (defun forth-assert-forward-word (content)
-  (destructuring-bind (content start end) (forth-strip-|-and-¹² content)
+  (cl-destructuring-bind (content start end) (forth-strip-|-and-¹² content)
     (forth-with-temp-buffer content
       (goto-char start)
       (font-lock-ensure) ; Make sure syntax-propertize function is called
@@ -87,8 +87,8 @@ The whitespace before and including \"|\" on each line is removed."
       (should (= (point) end)))))
 
 (defun forth-should-before/after (before after fun)
-  (destructuring-bind (before point-before) (forth-strip-|-and-→ before)
-    (destructuring-bind (after point-after) (forth-strip-|-and-→ after)
+  (cl-destructuring-bind (before point-before) (forth-strip-|-and-→ before)
+    (cl-destructuring-bind (after point-after) (forth-strip-|-and-→ after)
       (forth-with-temp-buffer before
 	(goto-char point-before)
 	(funcall fun)
@@ -96,8 +96,8 @@ The whitespace before and including \"|\" on each line is removed."
 	(should (= (point) point-after))))))
 
 (defun forth-should-region-before/after (before after fun)
-  (destructuring-bind (before start1 end1) (forth-strip-|-and-¹² before)
-    (destructuring-bind (after point-after) (forth-strip-|-and-→ after)
+  (cl-destructuring-bind (before start1 end1) (forth-strip-|-and-¹² before)
+    (cl-destructuring-bind (after point-after) (forth-strip-|-and-→ after)
       (forth-with-temp-buffer before
 	(set-mark start1)
 	(goto-char end1)
@@ -267,10 +267,20 @@ The whitespace before and including \"|\" on each line is removed."
    |  [char] b of bar
    |              baz
    |           endof
-   |  test ?of bar
-   |           baz
-   |       endof
+   |  test ?of
    |  drop exit
+   |endcase"))
+
+(ert-deftest forth-indent-customization ()
+  (forth-should-indent
+   "\ -*- forth-smie-bnf-extensions: ((ext (\"?of\" words \"endof\"))) -*-
+   |x case
+   |  [char] f of
+   |    foo
+   |  endof
+   |  test ?of
+   |    bar
+   |  endof
    |endcase"))
 
 ;; This is an tricky case because SMIE thinks, depending on
