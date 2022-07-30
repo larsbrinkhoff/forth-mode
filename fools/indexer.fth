@@ -70,14 +70,13 @@ set-current
   r>
 ;
 
-: %indexer-delete-stale-definitions ( indexer -- )
-  dup %indexer-uri 2@ rot %indexer-db @ db-delete-defintions-with-uri
+: %indexer-delete-stale-definitions ( uri$ indexer -- )
+  %indexer-db @ db-delete-defintions-with-uri
 ;
 
 : %indexer-process-uri ( reader uri$ indexer -- )
   >r
   r@ %indexer-uri 2!
-  r@ %indexer-delete-stale-definitions
   r> %indexer-parser parser-parse
 ;
 
@@ -104,6 +103,8 @@ set-current
 
 : indexer-process-textdoc ( textdoc indexer -- )
   swap dup make-textdoc-reader {: indexer doc r :}
-  r doc textdoc-uri indexer %indexer-process-uri
+  r doc textdoc-uri
+  2dup indexer %indexer-delete-stale-definitions
+  indexer %indexer-process-uri
   r drop-textdoc-reader
 ;

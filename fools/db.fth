@@ -93,7 +93,7 @@ constant %/db
   %definition-uri @ %db-string-slice 2over uri=
 ;
 
-: db-delete-defintions-with-uri ( uri$ db -- )
+: db-delete-definitions-with-uri ( uri$ db -- )
   ['] %db-uri-match? /definition rot %db-definitions vector-delete 2drop
 ;
 

@@ -36,7 +36,7 @@ require tap.fth
   s" foo" db db-select-definitions to v
   v vector-length 2 /definition * = ok
 
-  s" file:/bar/baz" db db-delete-defintions-with-uri
+  s" file:/bar/baz" db db-delete-definitions-with-uri
 
   s" foo" db db-select-definitions to v
   v vector-length 1 /definition * = ok
