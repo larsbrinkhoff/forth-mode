@@ -71,7 +71,7 @@ set-current
 ;
 
 : %indexer-delete-stale-definitions ( uri$ indexer -- )
-  %indexer-db @ db-delete-defintions-with-uri
+  %indexer-db @ db-delete-definitions-with-uri
 ;
 
 : %indexer-process-uri ( reader uri$ indexer -- )
