@@ -56,7 +56,9 @@ create %parser-whitespace-chars ' %init-whitespace-chars charset,
     false
   else
     2dup swap %parser-update-location
-    over %parser-token-buffer buffer-put-byte
+    over %parser-token-buffer
+    \ silently truncate overly long tokens
+    dup buffer-remaining 0= if 2drop else buffer-put-byte then
     true
   then
 ;
@@ -124,11 +126,13 @@ create %parser-whitespace-chars ' %init-whitespace-chars charset,
   again
 ;
 
+: %parser-token-mem-size ( -- u ) 0 %parser-line 0 %parser-token-mem - ;
+
 : init-parser ( wordlist env a-addr -- parser )
   >r
   r@ %parser-env !
   r@ %parser-wordlist !
-  r@ %parser-token-mem r@ %parser-line over -
+  r@ %parser-token-mem %parser-token-mem-size
   r@ %parser-token-buffer init-buffer drop
   0 r@ %parser-reader !
   0 r@ %parser-line !

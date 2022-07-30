@@ -59,10 +59,22 @@ set-current
   mparser %parser-line @ 1 = ok
 ;
 
+: junk-size %parser-token-mem-size 2* ;
+create junk junk-size allot
+
+: test-long-token ( -- )
+  0 0 mparser init-parser drop
+  junk junk-size 'a' fill
+  junk junk-size make-mem-reader mparser %parser-reader !
+  0 mparser %parser-line !
+  mparser %parser-scan junk %parser-token-mem-size compare 0= ok
+;
+
 : main ( -- )
   test1
   test-word-at
   test-skip
+  test-long-token
 ;
 
-' main 9 run-tests
+' main 10 run-tests
