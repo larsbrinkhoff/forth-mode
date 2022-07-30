@@ -25,12 +25,7 @@
 			(forth--eglot-tests-connect))
 		      (should (eglot-managed-p))
 		      (funcall fun))
-      ;; workaround for apparent bug in eglot-shutdown
-      (condition-case e
-	  (eglot-shutdown server :timeout 5)
-	(error
-	 (message "eglot-shutdown failed: %s" e)
-	 (should (not (jsonrpc-running-p server)))))
+      (eglot-shutdown server :timeout 5)
       (should (not (eglot-managed-p))))))
 
 (ert-deftest forth-start-eglot ()

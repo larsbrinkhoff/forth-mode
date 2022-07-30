@@ -10,6 +10,7 @@ begin-structure /lsp
   1 cells  +field %lsp-db
   /indexer +field %lsp-indexer
   /vector  +field %lsp-textdocs	   \ vector<textdoc>
+  1 cells  +field %lsp-shutdown-received?
 end-structure
 
 : %%lsp-initialize ( params lsp -- )
@@ -56,10 +57,19 @@ end-structure
 ;
 
 : %lsp-shutdown ( request lsp -- shutdown? )
-  %lsp-jsonrpc @ {: r j :}
+  dup %lsp-jsonrpc @ {: r l j :}
   json-null r j jsonrpc-send-response
-  true
+  true l %lsp-shutdown-received? !
+  false
 ;
+
+: %lsp-exit ( request lsp -- shutdown? )
+  %lsp-shutdown-received? @ 0= if
+    ." No shutdown message received. Exiting anyway."
+  then
+  bye
+;
+
 : %lsp-find-textdoc ( uri$ lsp -- textdoc|0 )
   {: a u l :}
   l %lsp-textdocs vector-bounds ?do
@@ -290,6 +300,7 @@ end-structure
   dup %lsp-jsonrpc @ {: lsp j :}
   s" initialize" ['] %lsp-initialize lsp j jsonrpc-register-method
   s" shutdown" ['] %lsp-shutdown lsp j jsonrpc-register-method
+  s" exit" ['] %lsp-exit lsp j jsonrpc-register-notification
   s" textDocument/definition" ['] %lsp-definition lsp j jsonrpc-register-method
   s" textDocument/didOpen"
   ['] %lsp-didOpen lsp j jsonrpc-register-notification
@@ -304,6 +315,7 @@ end-structure
   r@ %lsp-jsonrpc !
   r@ %lsp-textdocs init-vector drop
   r@ %lsp-register-methods
+  false r@ %lsp-shutdown-received? !
   make-db r@ %lsp-db !
   r>
 ;
