@@ -96,12 +96,13 @@ require tap.fth
   r@ jb-{ r@ jb-} r> jsonrpc-make-request
   client %jsonrpc-send-message
 
-  server jsonrpc-process-request ok
+  lsp %lsp-shutdown-received? @ 0= ok
+  server jsonrpc-process-request 0= ok
+  lsp %lsp-shutdown-received? @ ok
 
   client %json-parse-message 0= ok
 
   s" result" rot json-ref json-null = ok
-
 ;
 
 : main ( -- )
@@ -111,4 +112,4 @@ require tap.fth
   ['] test-shutdown with-jsonrpc
 ;
 
-' main 18 run-tests
+' main 20 run-tests
