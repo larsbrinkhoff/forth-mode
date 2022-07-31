@@ -70,12 +70,68 @@ create doc /textdoc allot
 
 ;
 
+: test-definitions ( -- )
+  s" file:foo.fth"
+  s" 1 constant const1 0 value val1 0 0 +field field1 variable var1"
+  doc init-textdoc drop
+  make-db {: db :}
+  db indexer init-indexer drop
+  doc indexer indexer-process-textdoc
+  s" const1" db db-select-definitions vector-length /definition = ok
+  s" val1" db db-select-definitions vector-length /definition = ok
+  s" field1" db db-select-definitions vector-length /definition = ok
+  s" var1" db db-select-definitions vector-length /definition = ok
+
+  s" file:foo.fth"
+  s" begin-structure struct1 end-structure synonym syn1 foo buffer: buf1"
+  doc init-textdoc drop
+  make-db to db
+  db indexer init-indexer drop
+  doc indexer indexer-process-textdoc
+  s" struct1" db db-select-definitions vector-length /definition = ok
+  s" syn1" db db-select-definitions vector-length /definition = ok
+  s" buf1" db db-select-definitions vector-length /definition = ok
+
+  s" file:foo.fth"
+  s" defer def1 ' + is def1 1 1 2constant 2const1 0 0 2value 2val1"
+  doc init-textdoc drop
+  make-db to db
+  db indexer init-indexer drop
+  doc indexer indexer-process-textdoc
+  s" def1" db db-select-definitions vector-length /definition 2* = ok
+  s" 2const1" db db-select-definitions vector-length /definition = ok
+  s" 2val1" db db-select-definitions vector-length /definition = ok
+
+  s" file:foo.fth"
+  s" field: field1 cfield: cfield1 code code1 mov 1,r1"
+  doc init-textdoc drop
+  make-db to db
+  db indexer init-indexer drop
+  doc indexer indexer-process-textdoc
+  s" field1" db db-select-definitions vector-length /definition = ok
+  s" cfield1" db db-select-definitions vector-length /definition = ok
+  s" code1" db db-select-definitions vector-length /definition = ok
+
+  s" file:foo.fth"
+  s\" \\ : f1 1 ; \n: bar ; ( : f2 2 ; ) s\" : f3 3 ; \""
+  doc init-textdoc drop
+  make-db to db
+  db indexer init-indexer drop
+  doc indexer indexer-process-textdoc
+  s" bar" db db-select-definitions vector-length /definition = ok
+  s" f1" db db-select-definitions vector-length 0 = ok
+  s" f2" db db-select-definitions vector-length 0 = ok
+  s" f3" db db-select-definitions vector-length 0 = ok
+
+;
+
 : main ( -- )
   test-init
   test-process-file
   test-process-directory
   test-process-textdoc
   test-process-file-and-textdoc
+  test-definitions
 ;
 
-' main 12 run-tests
+' main 29 run-tests
