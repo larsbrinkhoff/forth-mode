@@ -43,6 +43,10 @@ get-current indexer-wordlist set-current
 : variable ( indexer -- ) %indexer-record-definition ;
 : begin-structure ( indexer -- ) %indexer-record-definition ;
 : synonym ( indexer -- ) %indexer-record-definition ;
+: buffer: ( indexer -- ) %indexer-record-definition ;
+
+: defer ( indexer -- ) %indexer-record-definition ;
+: is ( indexer -- ) %indexer-record-definition ;
 
 : 2constant ( indexer -- ) %indexer-record-definition ;
 : 2value ( indexer -- ) %indexer-record-definition ;
@@ -53,6 +57,8 @@ get-current indexer-wordlist set-current
 : ffield: ( indexer -- ) %indexer-record-definition ;
 : dffield: ( indexer -- ) %indexer-record-definition ;
 : sffield: ( indexer -- ) %indexer-record-definition ;
+
+: code ( indexer -- ) %indexer-record-definition ;
 
 : s" ( indexer -- ) '"' swap %indexer-skip ;
 : ." ( indexer -- ) '"' swap %indexer-skip ;
