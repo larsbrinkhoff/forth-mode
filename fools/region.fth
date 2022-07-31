@@ -194,24 +194,15 @@ end-structure
 : region-base ( region -- a-addr ) %region-base @ ;
 : region-next-free ( region -- addr ) %region-free @ ;
 
-: region-add-byte ( char region -- )
+: region-add ( u region -- addr )
   {: r :}
-  1 r %region-ensure-room
-  r %region-free @ c!
-  1 r %region-free +!
+  dup r %region-ensure-room
+  r %region-free @		( u addr )
+  tuck + r %region-free !
 ;
 
-: region-add-cell ( x region -- )
-  {: r :}
-  1 cells r %region-ensure-room
-  r %region-free @ !
-  1 cells r %region-free +!
-;
+: region-add-byte ( char region -- ) 1 swap region-add c! ;
+: region-add-cell ( x region -- ) 1 cells swap region-add ! ;
 
 \ Append the slice C-ADDR/U to the current object.
-: region-add-slice ( c-addr u region -- )
-  {: a u r :}
-  u r %region-ensure-room
-  a r %region-free @ u move
-  u r %region-free +!
-;
+: region-add-slice ( c-addr u region -- ) over swap region-add swap move ;

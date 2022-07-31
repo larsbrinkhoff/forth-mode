@@ -30,10 +30,8 @@ end-structure
 ;
 
 : jb-add-codepoint ( codepoint jb -- )
-  %jb-region @ swap dup utf8-encoded-size {: region codepoint len :}
-  region region-next-free		  ( next-free )
-  len region region-blank		  ( next-free )
-  codepoint swap utf8-encode
+  %jb-region @ swap dup utf8-encoded-size ( region codepoint len )
+  rot region-add utf8-encode
 ;
 
 : jb-add-byte ( char jb -- ) %jb-region @ region-add-byte ;
