@@ -229,7 +229,7 @@ end-structure
   dup deinit-textdoc
   ['] %%lsp-didClose /textdoc l %lsp-textdocs vector-delete drop
   uri>filename 2dup %lsp-file-readable? if
-    l %lsp-indexer indexer-process-file
+    l %lsp-indexer indexer-reprocess-file
   else
     2drop
   then

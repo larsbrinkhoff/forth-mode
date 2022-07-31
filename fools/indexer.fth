@@ -86,12 +86,23 @@ set-current
   r> %indexer-parser parser-parse
 ;
 
-: indexer-process-file ( filename$ indexer -- )
-  rot rot 2dup make-file-uri 2swap make-file-reader
-  {: indexer u ulen r :}
-  r u ulen indexer %indexer-process-uri
+: %indexer-process-file ( filename$ delete? indexer -- )
+  2swap 2dup make-file-uri 2swap make-file-reader
+  {: delete? indexer uri urilen r :}
+  delete? if
+    uri urilen indexer %indexer-delete-stale-definitions
+  then
+  r uri urilen indexer %indexer-process-uri
   r drop-file-reader
-  u ulen drop-file-uri
+  uri urilen drop-file-uri
+;
+
+: indexer-process-file ( filename$ indexer -- )
+  false swap %indexer-process-file
+;
+
+: indexer-reprocess-file ( filename$ indexer -- )
+  true swap %indexer-process-file
 ;
 
 : %indexer-process-directory ( indexer file$ -- indexer )

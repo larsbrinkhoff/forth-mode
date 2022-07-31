@@ -246,6 +246,36 @@ require tap.fth
   s" file:foo.fth" lsp %lsp-find-textdoc 0= ok
 ;
 
+: test-didClose2 ( server client lsp -- )
+  over jsonrpc-builder {: server client lsp jb :}
+
+  s" test-didClose2" lsp %lsp-db @ db-select-definitions
+  dup vector-length /definition = ok
+
+  vector-base %definition-uri @ %db-string-slice
+  2dup s" test/sync.fth" string-suffix? ok
+  2>r				( r: uri$ )
+
+  2r@ s" test/sync.fth" slurp-file jb make-didOpen-notification
+  client %jsonrpc-send-message
+
+  server jsonrpc-process-request drop
+
+  s" test-didClose2" lsp %lsp-db @ db-select-definitions
+  vector-length /definition = ok
+
+  2r@ jb make-didClose-notification client %jsonrpc-send-message
+
+  server jsonrpc-process-request drop
+  2r@ lsp %lsp-find-textdoc 0= ok
+
+  \ Stale definitions should be have been removed
+  s" test-didClose2" lsp %lsp-db @ db-select-definitions
+  vector-length /definition = ok
+
+  2r> 2drop
+;
+
 : main  ( -- )
   ['] test-didOpen with-lsp
   ['] test-word-at with-lsp
@@ -253,6 +283,7 @@ require tap.fth
   ['] test-definition-invalid-position with-lsp
   ['] test-didChange-invalid-position with-lsp
   ['] test-didClose with-lsp
+  ['] test-didClose2 with-lsp
 ;
 
-' main 30 run-tests
+' main 36 run-tests
