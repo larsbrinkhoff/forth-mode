@@ -3,8 +3,8 @@
 require buffer.fth
 
 begin-structure /writer
-  1 cells +field %writer-write-xt ( c-addr u writer -- ior )
-  1 cells +field %writer-env
+  field:         %writer-write-xt ( c-addr u writer -- ior )
+  field:         %writer-env
   /buffer +field %writer-buffer
 end-structure
 

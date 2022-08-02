@@ -2,12 +2,12 @@
 
 require allocator.fth
 
-0
-1 cells +field %ht-entry-hash		\ Cached hash of key
-1 cells +field %ht-entry-key
-1 cells +field %ht-entry-value
-1 cells +field %ht-entry-next		\ 0|entry&
-constant %/ht-entry
+begin-structure %/ht-entry
+  field: %ht-entry-hash		\ Cached hash of key
+  field: %ht-entry-key
+  field: %ht-entry-value
+  field: %ht-entry-next		\ 0|entry&
+end-structure
 
 : %init-ht-entry ( key value hash next a-addr -- entry )
   >r
@@ -18,15 +18,15 @@ constant %/ht-entry
   r>
 ;
 
-0
-1 cells +field %hashtable-slots     \ [entry&]
-1 cells +field %hashtable-capacity  \ number of allocated slots
-1 cells +field %hashtable-count	    \ number of entries
-1 cells +field %hashtable-hash-xt   \ xt: key -- u
-1 cells +field %hashtable-=-xt	    \ xt: key1 key2 -- flag
-1 cells +field %hashtable-threshold \ resize if count raises above threshold
-/allocator +field %hashtable-allocator
-constant /hashtable
+begin-structure /hashtable
+  field: %hashtable-slots     \ [entry&]
+  field: %hashtable-capacity  \ number of allocated slots
+  field: %hashtable-count     \ number of entries
+  field: %hashtable-hash-xt   \ xt: key -- u
+  field: %hashtable-=-xt      \ xt: key1 key2 -- flag
+  field: %hashtable-threshold \ resize if count raises above threshold
+  /allocator +field %hashtable-allocator
+end-structure
 
 : %ht-allocate-zeroed ( u hashtable -- a-addr )
   over >r

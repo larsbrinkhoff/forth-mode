@@ -8,10 +8,10 @@ require misc.fth
 require gapbuffer-reader.fth
 require vector.fth
 
-0
-2 cells    +field %textdoc-uri	     \ uri (string)
-/gapbuffer +field %textdoc-gapbuffer \ gapbuffer
-constant /textdoc
+begin-structure /textdoc
+  2 cells    +field %textdoc-uri       \ uri (string)
+  /gapbuffer +field %textdoc-gapbuffer \ gapbuffer
+end-structure
 
 : init-textdoc ( uri$ text$ a-addr -- textdoc )
   >r

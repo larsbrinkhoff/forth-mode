@@ -23,17 +23,20 @@ end-structure
 : %json-header-field@ ( a-addr -- u )  @ 8 rshift ;
 : %json-header! ( field type a-addr -- u ) >r swap 8 lshift or r> ! ;
 
-%/json-header
-0 +field %json-string-bytes  \ array of utf-8 code units
-constant %/json-stringw
+begin-structure %/json-string
+  %/json-header +
+  0 +field %json-string-bytes  \ array of utf-8 code units
+end-structure
 
-%/json-header
-0 +field %json-array-values  \ array of json values
-constant %/json-array
+begin-structure %/json-array
+  %/json-header +
+  0 +field %json-array-values  \ array of json values
+end-structure
 
-%/json-header
-0 +field %json-object-entries  \ array of key-value pairs
-constant %/json-object
+begin-structure %/json-object
+  %/json-header +
+  0 +field %json-object-entries  \ array of key-value pairs
+end-structure
 
 : %+enum ( u -- u+1 u ) dup 1+ swap ;
 

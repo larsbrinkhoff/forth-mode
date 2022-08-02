@@ -2,10 +2,11 @@
 require reader.fth
 require gapbuffer.fth
 
-/reader
-1 cells +field %gapbuffer-reader-gapbuffer
-1 cells +field %gapbuffer-reader-offset
-constant %/gapbuffer-reader
+begin-structure %/gapbuffer-reader
+  /reader +
+  field: %gapbuffer-reader-gapbuffer
+  field: %gapbuffer-reader-offset
+end-structure
 
 : %gapbuffer-reader-read ( c-addr u gapbuffer-reader -- u2 ior )
   {: r :}

@@ -5,12 +5,12 @@ require bitops.fth
 require assert.fth
 require misc.fth
 
-0
-1 cells +field %vector-base	 \ pointer to start of array
-1 cells +field %vector-capacity	 \ number of allocated bytes
-1 cells +field %vector-end	 \ number of used bytes
-/allocator +field %vector-allocator
-constant /vector
+begin-structure /vector
+  field: %vector-base		\ pointer to start of array
+  field: %vector-capacity	\ number of allocated bytes
+  field: %vector-end		\ number of used bytes
+  /allocator +field %vector-allocator
+end-structure
 
 : %vector-alloc-mem ( capacity vector -- )
   >r

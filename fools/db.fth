@@ -5,23 +5,23 @@ require hash.fth
 require vector.fth
 require uri.fth
 
-0
-1 cells +field %db-string-length
-0       +field %db-string-contents
-constant %/db-string
+begin-structure %/db-string
+  field:   %db-string-length
+  0 +field %db-string-contents
+end-structure
 
-0
-1 cells    +field %definition-name   \ db-string
-1 cells    +field %definition-uri    \ uri (interned db-string)
-1 cells    +field %definition-line   \ u
-1 cells    +field %definition-column \ u
-\ 1 cells    +field %definition-signature \ stack comment 0|db-string
-constant /definition
+begin-structure /definition
+  field: %definition-name	\ db-string
+  field: %definition-uri	\ uri (interned db-string)
+  field: %definition-line	\ u
+  field: %definition-column	\ u
+  \ 1 cells    +field %definition-signature \ stack comment 0|db-string
+end-structure
 
-0
-/hashtable +field %db-strings	   \ hashtable<db-string,db-string>
-/vector    +field %db-definitions  \ vector<definition>
-constant %/db
+begin-structure %/db
+  /hashtable +field %db-strings	    \ hashtable<db-string,db-string>
+  /vector    +field %db-definitions \ vector<definition>
+end-structure
 
 : %db-string-slice  ( db-string -- c-addr u )
   dup %db-string-contents swap %db-string-length @
