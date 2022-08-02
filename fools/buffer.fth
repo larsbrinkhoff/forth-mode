@@ -92,3 +92,17 @@ end-structure
   assert( 2dup buffer-capacity u> 0= )
   %buffer-end !
 ;
+
+\ Does the buffer begin with the string STRING$?.  REMAINING is the
+\ the number of bytes that did not match; REMAINING is 0 if the entire
+\ string matched.  EOB? is true if the end-of-buffer was reached; EOB?
+\ is only true if REMAINING is non-zero.
+: buffer-looking-at? ( string$ buffer -- remaining eob? )
+  buffer-slice 2>r
+  begin				( string$ ) ( r: slice$ )
+    dup 0= if 2drop 2r> 2drop 0 false exit then
+    r@ 0= if nip 2r> 2drop true exit then
+    over c@ 2r@ drop c@ <> if nip 2r> 2drop false exit then
+    1 /string 2r> 1 /string 2>r
+  again
+;

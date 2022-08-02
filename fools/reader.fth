@@ -5,8 +5,8 @@ require assert.fth
 require ascii.fth
 
 begin-structure /reader
-  1 cells +field %reader-read-xt ( c-addr u env --  u2 ior )
-  1 cells +field %reader-env
+  field:         %reader-read-xt ( c-addr u env --  u2 ior )
+  field:         %reader-env
   /buffer +field %reader-buffer
 end-structure
 
@@ -14,94 +14,97 @@ end-structure
   dup %reader-env @ swap %reader-read-xt @ execute
 ;
 
-: %reader-refill ( reader -- u ior )
-  dup %reader-buffer {: r b :}
-  b buffer-clear
-  b buffer-capacity 0= if 0 0 exit then
-  1 b buffer-set-start \ 1 byte extra room for BUFFER-READ-LINE
+\ Prepare the buffer BUFFER for reading.  Move the last U bytes in the
+\ buffer to the beginning.
+: %reader-clear ( u buffer -- )
+  {: u b :}
+  u 0= if
+    b buffer-clear
+  else
+    b buffer-base b buffer-end u - + u ( preserve$ )
+    b buffer-clear
+    b buffer-put-slice
+    u b buffer-set-start
+    b buffer-capacity b buffer-set-end
+  then
+;
+
+: %reader-refill ( preserve reader -- u ior )
+  dup %reader-read-xt @ 0= if 2drop 0 0 exit then
+  dup %reader-buffer {: p r b :}
+  p b %reader-clear
+  assert( p b buffer-capacity u< )
   b buffer-slice r %reader-call-read ( u ior )
-  over 1+ b buffer-set-end
+  over b buffer-start + b buffer-set-end
+  0 b buffer-set-start
 ;
 
 \ On EOF, return -1 0.
 : reader-read-byte ( reader  -- char|-1 ior )
   dup %reader-buffer {: r b :}
   b buffer-empty? if
-    r %reader-refill		( u ior )
+    0 r %reader-refill		( u ior )
     ?dup if exit then		( u )
     0= if -1 0 exit then
   then
   b buffer-get-byte 0
 ;
 
-: %reader-unread-byte ( char reader -- )
-  %reader-buffer >r r@ buffer-start
-  assert( dup 0 u> )
-  1-
-  dup r@ buffer-set-start
-  r> buffer-put-byte-at
+: reader-peek-byte ( reader -- char|-1 ior )
+  dup %reader-buffer {: r b :}
+  b buffer-empty? if
+    0 r %reader-refill		( u ior )
+    ?dup if exit then		( u )
+    0= if -1 0 exit then
+  then
+  b buffer-start b buffer-get-byte-at 0
 ;
 
 \ Skip bytes as long XT returns false.
 : reader-skip ( xt[char -- flag] reader -- )
-  dup %reader-buffer {: xt r b :}
+  {: xt r :}
   begin
-    begin b buffer-empty? 0= while
-      b buffer-get-byte >r
-      r@ xt execute 0= if r> r %reader-unread-byte exit then
-      r> drop
-    repeat
-    r %reader-refill		( u ior )
+    r reader-peek-byte
     ?dup if 2drop exit then
-    0= if exit then
+    dup -1 = if drop exit then
+    xt execute 0= if exit then
+    r %reader-buffer buffer-get-byte drop
   again
 ;
 
-: reader-peek-byte ( reader -- char|-1 ior )
-  {: r :}
-  r reader-read-byte
-  ?dup if exit then
-  dup -1 = if 0 exit then
-  dup r %reader-unread-byte
-  0
+: %reader-looking-at? ( string$ reader -- remaining eof? ior )
+  dup %reader-buffer {: r b :}
+  begin		     ( string$ )
+    2dup b buffer-looking-at? 0= if nip nip false 0 exit then
+    >r				( string$ ) ( r: remaining' )
+    dup r@ - r %reader-refill
+    ?dup if nip nip nip r> false rot exit then
+    0= if 2drop r> true 0 exit then
+    r> drop
+  again
 ;
 
 : %rl-error ( c-addr' u' len ior -- len eof? ior ) 2swap 2drop false swap ;
 
-: %rl-push-char ( c-addr u len byte reader --
-		  [len eof ior true | c-addr2 u2 len2 false] )
-  {: r :}
-  2>r
-  dup 0= if
-    2drop 2>r r %reader-unread-byte
-    false 0 true
-  else
-    2dup drop r> swap c!
-    1 /string r> 1+ false
-  then
-;
-
-: %rl-cr ( c-addr u len reader --
-	   [len2 eof ior true | c-addr2 u2 len2 false] )
-  {: r :}
-  begin
-    r reader-read-byte		( c-addr' u' len' byte ior )
-    ?dup if nip %rl-error true exit then ( c-addr' u' len' byte )
-    dup -1 = if true abort" nyi" exit then
-    dup 'LF' = if drop nip nip false 0 true exit then
-    dup 'CR' <> if r %rl-push-char exit then
-    r %rl-push-char if true exit then
-  again
+: %rl-push-char ( c-addr u len byte -- c-addr2 u2 len2 )
+  assert( 2 pick 0<> )
+  >r 1+				( c-addr u len+1 ) ( r: byte )
+  rot dup r> swap c!		( u len+1 c-addr )
+  rot 1 /string rot
 ;
 
 : reader-read-line-crlf ( c-addr u1 reader -- u2 eof? ior )
   {: r :} 0
   begin				( c-addr' u' len )
-    r reader-read-byte		( c-addr' u' len byte ior)
-    ?dup if nip %rl-error exit then	   ( c-addr' u' len byte )
+    over 0= if nip nip false 0 exit then
+    s\" \r\n" r %reader-looking-at? 0= swap 0= and swap 0= and if
+      r %reader-buffer dup buffer-start 2 + swap buffer-set-start
+      nip nip false 0 exit
+    then
+    r reader-read-byte		    ( c-addr' u' len byte ior)
+    ?dup if nip %rl-error exit then ( c-addr' u' len byte )
     dup -1 = if drop nip nip true 0 exit then
-    dup 'CR' = if drop r %rl-cr if exit then then ( c-addr' u' len byte)
-    r %rl-push-char if exit then
+    %rl-push-char
   again
 ;
 

@@ -13,6 +13,36 @@ require tap.fth
   reader reader-read-byte throw 'b' = ok
   reader reader-read-byte throw 'c' = ok
 
+  s" abcdefghijklmnopqrstuvwxyz" fd1 fd-write throw
+  26 = ok
+  pad 26 reader reader-read-sloppy throw
+  pad 26 s" abcdefghijklmnopqrstuvwxyz" compare 0= ok
+
+  s" 1234" fd1 fd-write throw
+  4 = ok
+  reader reader-read-byte throw
+  '1' = ok
+  reader reader-read-byte throw
+  '2' = ok
+  reader reader-peek-byte throw
+  '3' = ok
+  reader reader-read-byte throw
+  '3' = ok
+  reader reader-read-byte throw
+  '4' = ok
+;
+
+: test-looking-at ( -- )
+  make-pipe throw swap make-fd-reader {: fd1 reader :}
+  reader 0<> ok
+  s\" abcd" fd1 fd-write throw 4 = ok
+  s" ab" reader %reader-looking-at? 0= ok 0= ok 0= ok
+  s" abcd" reader %reader-looking-at? 0= ok 0= ok 0= ok
+;
+
+: test-read-line ( -- )
+  make-pipe throw swap make-fd-reader {: fd1 reader :}
+  reader 0<> ok
   s\" de\r\n" fd1 fd-write throw
   4 = ok
   pad 10 reader reader-read-line-crlf throw
@@ -41,28 +71,12 @@ require tap.fth
   false = ok
   3 = ok
   pad 3 s\" xy\r" compare 0= ok
-
-  s" abcdefghijklmnopqrstuvwxyz" fd1 fd-write throw
-  26 = ok
-  pad 26 reader reader-read-sloppy throw
-  pad 26 s" abcdefghijklmnopqrstuvwxyz" compare 0= ok
-
-  s" 1234" fd1 fd-write throw
-  4 = ok
-  reader reader-read-byte throw
-  '1' = ok
-  reader reader-read-byte throw
-  '2' = ok
-  reader reader-peek-byte throw
-  '3' = ok
-  reader reader-read-byte throw
-  '3' = ok
-  reader reader-read-byte throw
-  '4' = ok
 ;
 
 : main ( -- )
   test1
+  test-looking-at
+  test-read-line
 ;
 
-' main 30 run-tests
+' main 39 run-tests

@@ -4,12 +4,12 @@
 
 require reader.fth
 
-/reader constant /mem-reader
-
-: %mem-read ( c-addr u env -- u2 ior ) drop 2drop 0 0 ;
+begin-structure /mem-reader
+  /reader +
+end-structure
 
 : init-mem-reader ( c-addr u a-addr -- reader )
-  >r 0 ['] %mem-read 2swap dup r> init-reader-with-buffer
+  >r 0 0 2swap dup r> init-reader-with-buffer
 ;
 
 : make-mem-reader ( c-addr u a-addr -- reader )

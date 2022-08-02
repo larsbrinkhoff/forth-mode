@@ -74,9 +74,24 @@ create buf /buffer allot
   slice 8 + @ -1 = ok
 ;
 
+: test-looking-at? ( -- )
+  slice slice-len buf init-buffer buf = ok
+  buf buffer-clear
+  s" abc" buf buffer-put-slice
+  buf buffer-flip
+  s" abc" buf buffer-looking-at? 0= ok 0= ok
+  s" ab" buf buffer-looking-at? 0= ok 0= ok
+  s" " buf buffer-looking-at? 0= ok 0= ok
+  s" abcd" buf buffer-looking-at? ok 1 = ok
+  s" abcdef" buf buffer-looking-at? ok 3 = ok
+  s" abde" buf buffer-looking-at? 0= ok 2 = ok
+  s" d" buf buffer-looking-at? 0= ok 1 = ok
+;
+
 : main ( -- )
   test1
   test-put-byte
+  test-looking-at?
 ;
 
-' main 32 run-tests
+' main 47 run-tests
