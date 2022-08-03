@@ -25,8 +25,8 @@ require utf8.fth
 1- constant %jtk-max
 
 begin-structure /json-parser
-  1 cells +field %json-parser-reader  \ reader& to read input from
-  /jb     +field %json-parser-builder \ builder to allocate JSON values
+  field:     %json-parser-reader  \ reader& to read input from
+  /jb +field %json-parser-builder \ builder to allocate JSON values
 end-structure
 
 : init-json-parser ( reader region a-addr -- parser )

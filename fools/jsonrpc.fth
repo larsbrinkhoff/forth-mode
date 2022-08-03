@@ -16,8 +16,8 @@ require region-allocator.fth
 begin-structure /jsonrpc
   /fd-reader +field %jsonrpc-reader
   /fd-writer +field %jsonrpc-writer
-  1 cells +field %jsonrpc-content-length
-  /region +field %jsonrpc-request-region \ region for per-request objects
+  field:            %jsonrpc-content-length
+  /region +field    %jsonrpc-request-region \ region for per-request objects
   /json-parser   +field %jsonrpc-parser
   /region-writer +field %jsonrpc-response-writer
   /region    +field %jsonrpc-permanent-region
@@ -26,9 +26,9 @@ begin-structure /jsonrpc
 end-structure
 
 begin-structure %/method
-  1 cells +field %method-xt   \ xt: request env -- shutdown?
-  1 cells +field %method-name \ json string
-  1 cells +field %method-env
+  field: %method-xt		\ xt: request env -- shutdown?
+  field: %method-name		\ json string
+  field: %method-env
 end-structure
 
 : %init-method ( name xt env a-addr -- method )

@@ -2,10 +2,11 @@
 require writer.fth
 require region.fth
 
-/writer
-1 cells +field %region-writer-cell
-1 cells +field %region-writer-region
-constant /region-writer
+begin-structure /region-writer
+  /writer +
+  field: %region-writer-cell
+  field: %region-writer-region
+end-structure
 
 : %region-writer-write ( c-addr u env -- u2 ior )
   over {: u :}

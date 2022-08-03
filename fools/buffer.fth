@@ -1,10 +1,10 @@
 require assert.fth
 
 begin-structure /buffer
-  1 cells +field %buffer-start	  \ START and END are offsets in the buffer;
-  1 cells +field %buffer-end	  \ START is inclusive and END exclusive.
-  1 cells +field %buffer-base	  \ Address of the memory region.
-  1 cells +field %buffer-capacity \ Size of the memory region.
+  field: %buffer-start	    \ START and END are offsets in the buffer;
+  field: %buffer-end	    \ START is inclusive and END exclusive.
+  field: %buffer-base	    \ Address of the memory region.
+  field: %buffer-capacity   \ Size of the memory region.
 end-structure
 
 : init-buffer ( c-addr u a-addr -- buffer )

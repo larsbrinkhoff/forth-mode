@@ -5,9 +5,9 @@ require region.fth
 require utf8.fth
 
 begin-structure /jb
-  1 cells +field %jb-region
-  /region +field %jb-stack	\ used for building arrays and objects.
-  /region +field %jb-marks	\ marks the beginning of current array/object
+  field:         %jb-region  \ region& where values will be allocated
+  /region +field %jb-stack   \ stack for building arrays and objects.
+  /region +field %jb-marks   \ marks the beginning of current array/object
 end-structure
 
 : init-jb ( region a-addr -- jb )

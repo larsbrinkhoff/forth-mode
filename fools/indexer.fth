@@ -6,11 +6,11 @@ require file-reader.fth
 require file.fth
 require textdoc.fth
 
-0
-1 cells +field %indexer-db
-/parser +field %indexer-parser
-2 cells +field %indexer-uri
-constant /indexer
+begin-structure /indexer
+  field:         %indexer-db
+  /parser +field %indexer-parser
+  2 cells +field %indexer-uri
+end-structure
 
 : %indexer-record-definition ( indexer -- )
   dup %indexer-parser {: mk p :}
