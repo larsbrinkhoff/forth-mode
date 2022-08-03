@@ -15,7 +15,7 @@ begin-structure /definition
   field: %definition-uri	\ uri (interned db-string)
   field: %definition-line	\ u
   field: %definition-column	\ u
-  \ 1 cells    +field %definition-signature \ stack comment 0|db-string
+  field: %definition-signature	\ stack comment 0|db-string
 end-structure
 
 begin-structure %/db
@@ -63,8 +63,9 @@ end-structure
   dup dup db %db-strings hashtable-put
 ;
 
-: %init-definition ( name uri line column a-addr -- def )
+: %init-definition ( name uri line column signature a-addr -- def )
   >r
+  r@ %definition-signature !
   r@ %definition-column !
   r@ %definition-line !
   r@ %definition-uri !
@@ -72,11 +73,13 @@ end-structure
   r>
 ;
 
-: db-insert-definition ( name-slice uri-slice line column db -- )
-  {: name namelen uri urilen line col db :}
+: db-insert-definition ( name$ uri$ line column signature$ db -- )
+  {: name namelen uri urilen line col sig siglen db :}
   name namelen %db-make-string
   uri urilen db %db-intern-string
-  line col /definition db %db-definitions vector-add-blank
+  line col
+  siglen 0= if 0 else sig siglen %db-make-string then
+  /definition db %db-definitions vector-add-blank
   %init-definition drop
 ;
 
@@ -113,6 +116,7 @@ end-structure
   d %definition-uri @ %db-string-slice type ." :"
   d %definition-line @ 0 u.r ." :"
   d %definition-column @ 0 u.r
+  d %definition-signature @ ?dup if ."  " %db-string-slice type then
 ;
 
 : db-list-definitions ( db -- )

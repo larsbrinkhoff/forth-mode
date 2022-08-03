@@ -18,7 +18,7 @@ require tap.fth
 
 : test-insert-def ( -- )
   make-db {: db | v :}
-  s" foo" s" file:/bar/baz" 10 0 db db-insert-definition
+  s" foo" s" file:/bar/baz" 10 0 s" " db db-insert-definition
 
   s" foo" db db-select-definitions to v
   v vector-length /definition = ok
@@ -29,9 +29,9 @@ require tap.fth
 
 : test-delete-def ( -- )
   make-db {: db | v :}
-  s" foo" s" file:/bar/baz" 10 0 db db-insert-definition
-  s" foo" s" file:/bar/quux" 10 0 db db-insert-definition
-  s" bar" s" file:/bar/baz" 12 0 db db-insert-definition
+  s" foo" s" file:/bar/baz" 10 0 s" " db db-insert-definition
+  s" foo" s" file:/bar/quux" 10 0 s" " db db-insert-definition
+  s" bar" s" file:/bar/baz" 12 0 s" " db db-insert-definition
 
   s" foo" db db-select-definitions to v
   v vector-length 2 /definition * = ok

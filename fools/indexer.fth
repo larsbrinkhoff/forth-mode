@@ -5,11 +5,13 @@ require db.fth
 require file-reader.fth
 require file.fth
 require textdoc.fth
+require region.fth
 
 begin-structure /indexer
   field:         %indexer-db
   /parser +field %indexer-parser
   2 cells +field %indexer-uri
+  /region +field %indexer-scratch
 end-structure
 
 : %indexer-record-definition ( indexer -- )
@@ -18,8 +20,70 @@ end-structure
   mk %indexer-uri 2@
   p %parser-line @
   p %parser-column @
+  s" "
   mk %indexer-db @
   db-insert-definition
+;
+
+: %indexer-begin-string ( indexer -- )
+  assert( dup %indexer-scratch region-object-size 0= )
+  drop
+;
+
+: %indexer-grow-string ( string$ indexer -- )
+  %indexer-scratch region-add-slice
+;
+
+: %indexer-finish-string ( indexer -- string$ )
+  %indexer-scratch
+  dup region-object-size
+  swap region-finish
+  swap
+;
+
+: %indexer-free-string ( string$ indexer -- )
+  nip %indexer-scratch region-free
+;
+
+: %indexer-string-to-scratch ( string$ indexer -- string2$ )
+  {: i :}
+  i %indexer-begin-string
+  i %indexer-grow-string
+  i %indexer-finish-string
+;
+
+: %indexer-parse-comment ( indexer -- comment$ next-token$ )
+  dup %indexer-parser {: indexer p :}
+  p %parser-scan      ( token$ )
+  2dup s" (" compare 0<> if s" " 2swap exit then
+  indexer %indexer-begin-string
+  indexer %indexer-grow-string
+  begin
+    p %parser-scan      ( token$' )
+    2dup s" )" compare 0= if
+      s"  " indexer %indexer-grow-string
+      indexer %indexer-grow-string
+      indexer %indexer-finish-string ( comment$ )
+      p %parser-scan
+      exit
+    else
+      s"  " indexer %indexer-grow-string
+      indexer %indexer-grow-string
+    then
+  again
+;
+
+: %indexer-colon-definition ( indexer -- )
+  dup %indexer-parser {: indexer p :}
+  p %parser-scan      ( $name )
+  indexer %indexer-string-to-scratch ( $name' )
+  indexer %indexer-uri 2@
+  p %parser-line @
+  p %parser-column @
+  indexer %indexer-parse-comment 2>r
+  indexer %indexer-db @ db-insert-definition
+  indexer %indexer-scratch region-free-all
+  2r> p %parser-dispatch
 ;
 
 : %%indexer-skip ( terminator char -- terminator|-1 flag )
@@ -35,7 +99,7 @@ end-structure
 wordlist constant indexer-wordlist
 get-current indexer-wordlist set-current
 
-: : ( indexer -- ) %indexer-record-definition ;
+: : ( indexer -- ) %indexer-colon-definition ;
 : +field ( indexer -- ) %indexer-record-definition ;
 : constant ( indexer -- ) %indexer-record-definition ;
 : value ( indexer -- ) %indexer-record-definition ;
@@ -73,6 +137,7 @@ set-current
   >r
   r@ %indexer-db !
   indexer-wordlist r@ r@ %indexer-parser init-parser drop
+  r@ %indexer-scratch init-region drop
   r>
 ;
 

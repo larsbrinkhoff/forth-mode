@@ -5,7 +5,7 @@ require tap.fth
 create indexer /indexer allot
 
 get-current wordlist set-current
-: foo 1 ;
+: foo ( -- u ) 1 ;
 set-current
 : foo 2 ;
 
@@ -20,8 +20,11 @@ set-current
   \ db db-list-definitions
   s" foo" db db-select-definitions
   dup vector-length 2 /definition * = ok
-  dup vector-base %definition-line @ 7 = ok
-  dup vector-base %definition-column @ 5 = ok
+  dup vector-base
+  dup %definition-line @ 7 = ok
+  dup %definition-column @ 5 = ok
+  dup %definition-signature @ %db-string-slice s" ( -- u )" compare 0= ok
+  drop
   drop-vector
 ;
 
@@ -32,7 +35,7 @@ set-current
   s" test-process-directory" db db-select-definitions
   \ db db-list-definitions
   dup vector-length 1 /definition * = ok
-  dup vector-base %definition-line @ 27 = ok
+  dup vector-base %definition-line @ 30 = ok
   dup vector-base %definition-column @ 24 = ok
   drop-vector
 ;
@@ -47,8 +50,11 @@ create doc /textdoc allot
   \ db db-list-definitions
   s" bar" db db-select-definitions
   dup vector-length 1 /definition * = ok
-  dup vector-base %definition-line @ 0 = ok
-  dup vector-base %definition-column @ 13 = ok
+  dup vector-base
+  dup %definition-line @ 0 = ok
+  dup %definition-column @ 13 = ok
+  dup %definition-signature @ 0= ok
+  drop
   drop-vector
 ;
 
@@ -134,4 +140,4 @@ create doc /textdoc allot
   test-definitions
 ;
 
-' main 29 run-tests
+' main 31 run-tests
