@@ -6,11 +6,11 @@ require indexer.fth
 require textdoc.fth
 
 begin-structure /lsp
-  1 cells  +field %lsp-jsonrpc
-  1 cells  +field %lsp-db
+  field:          %lsp-jsonrpc
+  field:          %lsp-db
   /indexer +field %lsp-indexer
-  /vector  +field %lsp-textdocs	   \ vector<textdoc>
-  1 cells  +field %lsp-shutdown-received?
+  /vector  +field %lsp-textdocs	\ vector<textdoc>
+  field:          %lsp-shutdown-received?
 end-structure
 
 : %%lsp-initialize ( params lsp -- )
@@ -43,6 +43,7 @@ end-structure
     j jb-{
       s" definitionProvider" json-true j jb-:
       s" textDocumentSync" j %lsp-make-docsync-caps j jb-:
+      s" hoverProvider" json-true j jb-:
     j jb-} j jb-:
   j jb-}
 ;
@@ -165,6 +166,35 @@ end-structure
   j jb-]
 ;
 
+: %lsp-string>pad ( string$ pos -- pos2 )
+  2dup + >r
+  pad + swap move
+  r>
+;
+
+: %lsp-join ( string1$ string2$ -- string3$ )
+  2swap 0 %lsp-string>pad
+  %lsp-string>pad pad swap
+;
+
+\ FIXME: If there are multiple definitions we could be a bit more
+\ helpful.  E.g. use the one in the current file.
+: %lsp-definitions>hover ( vector<definition> jb -- json x)
+  {: v j :}
+  v vector-length /definition <> if json-null exit then
+  v vector-base %definition-signature @ 0= if json-null exit then
+  j jb-{
+  s" contents"
+  j jb-{
+  s" value" v vector-base >r
+  r@ %definition-name @ %db-string-slice s"  " %lsp-join
+  r> %definition-signature @ %db-string-slice %lsp-join
+  j jb-str j jb-:
+  s" language" s" forth" j jb-str j jb-:
+  j jb-} j jb-:
+  j jb-}
+;
+
 : %lsp-send-invalid-position ( request jsonrpc -- )
   dup jsonrpc-builder {: r j jb :}
   s" id" r json-ref
@@ -177,6 +207,23 @@ end-structure
   j jsonrpc-send-error
 ;
 
+: %lsp-unpack-position ( position -- line col )
+  >r s" line" r@ json-ref json-integer-value
+  s" character" r> json-ref json-integer-value
+;
+
+: %lsp-unpack-range ( range -- start-line start-col end-line end-col )
+  >r s" start" r@ json-ref %lsp-unpack-position
+  s" end" r> json-ref %lsp-unpack-position
+;
+
+: %lsp-unpack-textdoc-pos ( request -- uri$ line col )
+  {: r :}
+  s" params" r json-ref s" textDocument" rot json-ref s" uri" rot json-ref
+  json-string-slice
+  s" params" r json-ref s" position" rot json-ref %lsp-unpack-position
+;
+
 : %%lsp-definition ( uri$ line col request lsp -- vector<definition>|0 )
   {: uri urilen line col r l :}
   uri urilen line col l %lsp-valid-position? 0= if
@@ -185,17 +232,12 @@ end-structure
   then
   uri urilen line col l %lsp-word-at
   ." word-at => " 2dup type cr
-    l %lsp-db @ db-select-definitions
+  l %lsp-db @ db-select-definitions
 ;
 
 : %lsp-definition ( request lsp -- shutdown? )
   dup %lsp-jsonrpc @ {: r l j :}
-  s" params" r json-ref s" textDocument" rot json-ref s" uri" rot json-ref
-  json-string-slice
-  s" params" r json-ref s" position" rot json-ref s" line" rot json-ref
-  json-integer-value
-  s" params" r json-ref s" position" rot json-ref s" character" rot json-ref
-  json-integer-value
+  r %lsp-unpack-textdoc-pos
   r l %%lsp-definition dup 0= if drop false exit then
   dup j jsonrpc-builder %lsp-definitions>locations swap drop-vector
   ." definition => " dup .json cr
@@ -234,16 +276,6 @@ end-structure
     2drop
   then
   false
-;
-
-: %lsp-unpack-position ( position -- line col )
-  >r s" line" r@ json-ref json-integer-value
-  s" character" r> json-ref json-integer-value
-;
-
-: %lsp-unpack-range ( range -- start-line start-col end-line end-col )
-  >r s" start" r@ json-ref %lsp-unpack-position
-  s" end" r> json-ref %lsp-unpack-position
 ;
 
 2 constant MessageType.Warning
@@ -296,18 +328,41 @@ end-structure
   false
 ;
 
+: %%lsp-hover ( uri$ line col request lsp -- )
+  {: uri urilen line col r l :}
+  uri urilen line col l %lsp-valid-position? 0= if
+    r l %lsp-jsonrpc @ %lsp-send-invalid-position
+    0 exit
+  then
+  uri urilen line col l %lsp-word-at
+  ." word-at => " 2dup type cr
+  l %lsp-db @ db-select-definitions
+;
+
+: %lsp-hover ( request lsp -- shutdown? )
+  dup %lsp-jsonrpc @ {: r l j :}
+  r %lsp-unpack-textdoc-pos r l %%lsp-hover
+  dup 0= if drop false exit then
+  dup j jsonrpc-builder %lsp-definitions>hover swap drop-vector
+  ." hover => " dup .json cr
+  r j jsonrpc-send-response
+  false
+;
+
 : %lsp-register-methods ( lsp -- )
   dup %lsp-jsonrpc @ {: lsp j :}
   s" initialize" ['] %lsp-initialize lsp j jsonrpc-register-method
   s" shutdown" ['] %lsp-shutdown lsp j jsonrpc-register-method
   s" exit" ['] %lsp-exit lsp j jsonrpc-register-notification
   s" textDocument/definition" ['] %lsp-definition lsp j jsonrpc-register-method
+  s" textDocument/hover" ['] %lsp-hover lsp j jsonrpc-register-method
   s" textDocument/didOpen"
   ['] %lsp-didOpen lsp j jsonrpc-register-notification
   s" textDocument/didChange"
   ['] %lsp-didChange lsp j jsonrpc-register-notification
   s" textDocument/didClose"
   ['] %lsp-didClose lsp j jsonrpc-register-notification
+ 
 ;
 
 : init-lsp ( jsonrpc a-addr -- lsp )
