@@ -3,7 +3,7 @@
 ;; This code mimics the Forth text interpreter and adds text
 ;; properties as side effect.
 
-(require 'cl)
+(require 'cl-lib)
 
 
 ;;; Helpers

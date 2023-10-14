@@ -18,7 +18,7 @@
 
 (defun forth-pad-line ()
   (end-of-line)
-  (while (plusp (logand (1- (point)) 63))
+  (while (cl-plusp (logand (1- (point)) 63))
     (insert " "))
   (ignore-errors (delete-char 1)
 		 (if (looking-at "\n")
@@ -48,7 +48,7 @@
       (goto-char start)
       (while (< (point) end)
 	(if (looking-at "\n")
-	    (incf n))
+	    (cl-incf n))
 	(forward-char 1)))
     (message "N = %d" n)
     n))
@@ -67,7 +67,7 @@
 	     (forth-line (1+ n))
 	     (delete-region (line-beginning-position) (line-end-position))
 	     (delete-char 1))))
-	((minusp forth-change-newlines)
+	((cl-minusp forth-change-newlines)
 	 (let ((n (logand (+ (line-number-at-pos) 15) -16)))
 	   (save-excursion
 	     (forth-line n)

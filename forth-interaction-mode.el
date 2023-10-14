@@ -165,7 +165,7 @@
   (interactive (list (buffer-file-name (current-buffer))))
   (let ((result (forth-interaction-send-raw-result "include " file)))
     (setq result (forth-scrub result t))
-    (if (< (count ?\n result) 2)
+    (if (< (cl-count ?\n result) 2)
 	(message "%s" result)
       (pop-to-buffer forth-interaction-buffer))
     (comint-output-filter (get-buffer-process forth-interaction-buffer)

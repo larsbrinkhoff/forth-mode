@@ -24,12 +24,7 @@
 
 ;;; Code:
 
-(eval-and-compile
-  (or (require 'cl-lib nil t)
-      ;; Emacs 23
-      (progn
-	(require 'cl)
-	(defmacro cl-ecase (&rest x) `(ecase . ,x)))))
+(require 'cl-lib nil t)
 
 (defgroup forth-spec
   nil
