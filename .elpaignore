@@ -1,0 +1,6 @@
+autoloads.el
+build.el
+forth-mode-autoloads.el
+forth-mode-pkg.el
+Makefile
+.travis.yml
