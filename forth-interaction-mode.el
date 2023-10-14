@@ -163,6 +163,7 @@
 ;;;###autoload
 (defun forth-load-file (file)
   (interactive (list (buffer-file-name (current-buffer))))
+  (save-some-buffers)
   (let ((result (forth-interaction-send-raw-result (format "s\" %s\" included" file))))
     (setq result (forth-scrub result t))
     (if (< (cl-count ?\n result) 2)
