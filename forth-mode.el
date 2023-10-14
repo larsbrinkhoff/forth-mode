@@ -4,6 +4,7 @@
 ;; Author: Lars Brinkhoff <lars@nocrew.org>
 ;; Keywords: languages forth
 ;; URL: http://github.com/larsbrinkhoff/forth-mode
+;; Package-Requires: ((cl-lib "0.2"))
 ;; Version: 0.2
 
 ;;; Commentary:
@@ -12,7 +13,7 @@
 ;;; Code:
 
 (eval-when-compile (byte-compile-disable-warning 'cl-functions))
-(require 'cl)
+(require 'cl-lib)
 (require 'forth-syntax)
 (require 'forth-smie)
 (require 'forth-spec)
@@ -90,9 +91,9 @@
 ;; forth-menu-entries.
 (defun forth-create-menu (entries)
   (mapcar (lambda (entry)
-	     (let ((menu-name (first entry))
-		   (menu-string (second entry))
-		   (menu-function (third entry)))
+	     (let ((menu-name (cl-first entry))
+		   (menu-string (cl-second entry))
+		   (menu-function (cl-third entry)))
 		  (define-key forth-mode-map
 		    (vector 'menu-bar 'forth menu-name)
 		    (cons menu-string menu-function))))
@@ -125,8 +126,8 @@
   (let ((list (forth-words)))
     (when (fboundp 'imenu--make-index-alist)
       (dolist (index (imenu--make-index-alist t))
-	(when (listp (rest index))
-	  (dolist (def (rest index))
+	(when (listp (cl-rest index))
+	  (dolist (def (cl-rest index))
 	    (push (car def) list)))))
     (list (forth-symbol-start) (forth-symbol-end)
 	  ;; FIXME: this should use `completion-table-case-fold' or
