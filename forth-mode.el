@@ -1,4 +1,4 @@
-;;; forth-mode.el --- Programming language mode for Forth
+;;; forth-mode.el --- Programming language mode for Forth  -*- lexical-binding: t; -*-
 ;;; Copyright 2014 Lars Brinkhoff
 
 ;; Author: Lars Brinkhoff <lars@nocrew.org>
@@ -12,7 +12,6 @@
 
 ;;; Code:
 
-(eval-when-compile (byte-compile-disable-warning 'cl-functions))
 (require 'cl-lib)
 (require 'forth-syntax)
 (require 'forth-smie)

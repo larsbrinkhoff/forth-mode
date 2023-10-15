@@ -276,3 +276,4 @@ SYNTAX must be a valid argument for `string-to-syntax'."
 	  (cl-assert (< start (point))))))))
 
 (provide 'forth-syntax)
+;;; forth-syntax.el ends here
