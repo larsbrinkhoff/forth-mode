@@ -24,19 +24,14 @@
 
 ;;; Code:
 
-(eval-and-compile
-  (or (require 'cl-lib nil t)
-      ;; Emacs 23
-      (progn
-	(require 'cl)
-	(defmacro cl-ecase (&rest x) `(ecase . ,x)))))
+(require 'cl-lib nil t)
 
 (defgroup forth-spec
   nil
   "Browsing Forth standards."
   :group 'forth)
 
-(defcustom forth-spec-url-2012 "http://www.forth200x.org/documents/html/"
+(defcustom forth-spec-url-2012 "https://forth-standard.org/standard/"
   "The URL which contains the HTML version of the standard.
 If you have a local copy set this variable to
 something like \"file://home/joe/docs/ANS-Forth/\".
@@ -128,9 +123,8 @@ Note: the string should have a trailing backslash."
 (defun forth-spec--parse-2012 ()
   (let ((index '())
 	(case-fold-search nil)
-	(rx "<td>\
-<a href=\"\\([^\"]+\\)\">\\([^<]+\\)</a>\
-</td><td>\\(?:\"\\([^\"]+\\)\"\\)?</td>"))
+	(rx "</td><td><a href=\"\\([^\"]+\\)\">\
+\\([^<]+\\)</a></td><td>\\(?:\"\\(\"+\\)\"\\)??</td>"))
     (search-forward "<table")
     (while (re-search-forward rx nil t)
       (push (list (forth-spec--decode-entities (match-string 2))
