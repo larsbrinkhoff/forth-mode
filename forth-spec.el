@@ -137,7 +137,8 @@ Note: the string should have a trailing backslash."
   (let ((index '())
 	(case-fold-search nil)
 	(rx "</td><td><a href=\"\\([^\"]+\\)\">\
-\\([^<]+\\)</a></td><td>\"\\([^\"]+\\)\"</td><td[^<]*>[^<]*</td></tr>"))
+\\([^<]+\\)</a></td><td>\\(:?\"\\([^\"]+\\)\"\\)?</td>\
+<td[^<]*>[^<]*</td></tr>"))
     (search-forward "<table")
     (while (re-search-forward rx nil t)
       (push (list (forth-spec--decode-entities (match-string 2))

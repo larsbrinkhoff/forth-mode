@@ -371,7 +371,11 @@ The whitespace before and including \"|\" on each line is removed."
   (should (equal (forth-spec--build-url "SWAP" 1994)
 		 "http://lars.nocrew.org/dpans/dpans6.htm#6.1.2260"))
   (should (string-match "core/ColonNONAME"
-			(forth-spec--build-url ":NONAME" 2012))))
+			(forth-spec--build-url ":NONAME" 2012)))
+  (should (string-match "memory/ALLOCATE"
+			(forth-spec--build-url "ALLOCATE" 2012)))
+  (should (= (length (cdr (assoc 2012 forth-spec--index-cache)))
+	     450)))
 
 (ert-deftest forth-fill-comment ()
   (forth-should-before/after
