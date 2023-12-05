@@ -29,6 +29,7 @@
     (define-key map (kbd "C-c C-e")   'forth-eval-last-expression)
     (define-key map (kbd "C-x M-e")   'forth-eval-last-expression-display-output)
     (define-key map (kbd "C-c C-z")   'forth-switch-to-output-buffer)
+    (define-key map (kbd "C-c C-t")   'forth-term)
     (define-key map (kbd "C-c :")     'forth-eval)
     (define-key map (kbd "C-c C-d 1") 'forth-spec-lookup-1994)
     (define-key map (kbd "C-c C-d 2") 'forth-spec-lookup-2012)
