@@ -31,10 +31,12 @@
   "Browsing Forth standards."
   :group 'forth)
 
+;; A HTML version of the standard can be downloaded from:
+;; http://www.forth200x.org/documents/forth-2012-html-3.zip
 (defcustom forth-spec-url-2012 "https://forth-standard.org/standard/"
   "The URL which contains the HTML version of the standard.
 If you have a local copy set this variable to
-something like \"file://home/joe/docs/ANS-Forth/\".
+something like \"file:/home/joe/docs/ANS-Forth/\".
 
 Note: the string should have a trailing backslash."
   :type 'file
@@ -111,10 +113,21 @@ Note: the string should have a trailing backslash."
 
 (defun forth-spec--parse-index (version)
   (forth-spec--call/url-buffer (forth-spec--index-url version)
-			  (forth-spec--versioned parse-index version)))
+			       (forth-spec--versioned parse-index version)))
 
 (defun forth-spec--call/url-buffer (url fun)
-  (let ((buffer (url-retrieve-synchronously url)))
+  (let* ((buffer (url-retrieve-synchronously url))
+	 (buffer
+	  ;; try without .html (workaround for forth-standard.org)
+	  (save-current-buffer
+	    (set-buffer buffer)
+	    (goto-char (point-min))
+	    (cond ((and (search-forward "{\"NOT\":\"FOUND\"}" nil t)
+			(string-match "^\\(.*\\)\\.html$" url))
+		   (let ((url-sans-html (match-string 1 url)))
+		     (kill-buffer buffer)
+		     (url-retrieve-synchronously url-sans-html)))
+		  (t buffer)))))
     (unwind-protect
 	(with-current-buffer buffer
 	  (funcall fun))
@@ -124,7 +137,8 @@ Note: the string should have a trailing backslash."
   (let ((index '())
 	(case-fold-search nil)
 	(rx "</td><td><a href=\"\\([^\"]+\\)\">\
-\\([^<]+\\)</a></td><td>\\(?:\"\\(\"+\\)\"\\)??</td>"))
+\\([^<]+\\)</a></td><td>\\(:?\"\\([^\"]+\\)\"\\)?</td>\
+<td[^<]*>[^<]*</td></tr>"))
     (search-forward "<table")
     (while (re-search-forward rx nil t)
       (push (list (forth-spec--decode-entities (match-string 2))
@@ -133,7 +147,6 @@ Note: the string should have a trailing backslash."
 	    index))
     (reverse index)))
 
-;; (forth-spec--parse-index 1994)
 (defun forth-spec--parse-1994 ()
   (let ((index '())
 	(case-fold-search nil)
