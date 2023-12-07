@@ -362,7 +362,22 @@ end-structure
   ['] %lsp-didChange lsp j jsonrpc-register-notification
   s" textDocument/didClose"
   ['] %lsp-didClose lsp j jsonrpc-register-notification
- 
+;
+
+: %bl? ( char -- flag ) bl = ;
+
+: %insert-std-effects ( db -- )
+  s" std-effects.txt" r/o open-file throw
+  {: db f :}
+  begin
+    pad 256 f read-line throw while
+    pad swap
+    ['] %bl? rot rot string-split  ( name$ effect$ )
+    dup 0<> if 1 /string then
+    0 0 0 0 2rot db db-insert-definition
+  repeat
+  drop
+  f close-file throw
 ;
 
 : init-lsp ( jsonrpc a-addr -- lsp )
@@ -371,6 +386,7 @@ end-structure
   r@ %lsp-textdocs init-vector drop
   r@ %lsp-register-methods
   false r@ %lsp-shutdown-received? !
-  make-db r@ %lsp-db !
+  make-db dup %insert-std-effects
+  r@ %lsp-db !
   r>
 ;

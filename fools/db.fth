@@ -93,7 +93,12 @@ end-structure
 ;
 
 : %db-uri-match? ( uri$ definition -- uri$ flag )
-  %definition-uri @ %db-string-slice 2over uri=
+  %definition-uri @ %db-string-slice
+  dup 0= if
+    2drop false
+  else
+    2over uri=
+  then
 ;
 
 : db-delete-definitions-with-uri ( uri$ db -- )
