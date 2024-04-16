@@ -29,6 +29,7 @@ commands for interacting with a running Forth session.
 * Overview::
 * Using Forth Mode::
 * Forth Interaction::
+* Configuration::
 @end menu
 
 @node Overview
@@ -112,6 +113,10 @@ in the minibuffer.
 Evaluate the expression before point.  Display the output, if any, in
 the interactive Forth session.
 
+If the variable @verb{.forth-go-to-interaction-buffer-after-eval.} is true,
+then the active buffer will be the interaction buffer right after this command.
+If not, then the source buffer will be active.
+
 @item C-M-x
 @itemx M-x forth-eval-defun
 
@@ -127,6 +132,22 @@ Load the current file into the interactive Forth Session.
 @itemx M-x forth-see
 
 Display a human-readable representation of the word under point.
+
+@end table
+
+@node Configuration
+
+The following variables can be used to customize Forth mode.
+You can set them in your Emacs init file, @verb{+.emacs+}, as
+in the following example.
+
+@code{(setq forth-go-to-interaction-buffer-after-eval t)}
+
+@table @t
+
+@item forth-go-to-interaction-buffer-after-eval
+
+If not nil, go to interaction buffer after Eval last expression.
 
 @end table
 
