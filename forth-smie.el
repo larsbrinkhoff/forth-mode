@@ -3,6 +3,10 @@
 
 (require 'smie)
 
+(defgroup forth-smie nil
+  "Forth SMIE-based indentation control."
+  :group 'forth)
+
 (defcustom forth-smie-basic-indent 2
   "Basic amount of indentation."
   :type 'integer
