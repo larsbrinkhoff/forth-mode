@@ -1,4 +1,4 @@
-;;; forth-mode.el --- Programming language mode for Forth
+;;; forth-mode.el --- Programming language mode for Forth -*-lexical-binding: t-*-
 ;;; Copyright 2014 Lars Brinkhoff
 
 ;; Author: Lars Brinkhoff <lars@nocrew.org>
@@ -208,7 +208,7 @@
 	  ("Variables"
 	   "^\\s-*2?\\(variable\\|create\\|value\\)\\s-+\\(\\(\\sw\\|\\s_\\)+\\)" 2)
 	  ("Constants"
-	   "\\s-2?constant\\s-+\\(\\(\\sw\\|\\s_\\)+\\)" 1))) 
+	   "\\s-2?constant\\s-+\\(\\(\\sw\\|\\s_\\)+\\)" 1)))
   (forth-mode-init-menu))
 
 ;;;###autoload
