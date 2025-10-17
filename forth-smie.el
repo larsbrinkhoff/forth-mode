@@ -1,4 +1,5 @@
-;; SMIE based indentation
+;; forth-smie.le --- SMIE based indentation for Forth -*-lexical-binding: t-*-
+
 
 (require 'smie)
 
@@ -14,7 +15,7 @@
 We add this list of BNF rules to the default rules to support
 user defined syntax.  E.g., setting this variable to
 
-  '((gforth-ext (\"?of\" words \"endof\")))
+  \\='((gforth-ext (\"?of\" words \"endof\")))
 
 tells Emacs to recognize ?OF ... ENDOF as a matching pair of tokens.
 
@@ -51,8 +52,9 @@ This variable can also be set in .dir-locals.el, e.g.:
 			    forth-smie-bnf-extensions))))
 
 (unless (fboundp 'pcase)
-  (defmacro pcase (form &rest forms)
-    0))
+  (with-no-warnings
+    (defmacro pcase (form &rest forms)
+      0)))
 
 (defun forth-smie--indentation-rules (kind token)
   (pcase (cons kind token)

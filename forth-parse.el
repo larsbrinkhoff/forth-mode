@@ -1,3 +1,5 @@
+;;; forth-parse.el --- Parsing Forth -*-lexical-binding: t-*-
+
 (require 'forth-mode)
 
 (defvar forth-stack-comments (make-hash-table :test 'equal))

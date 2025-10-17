@@ -1,4 +1,8 @@
+;;; forth-block-mode.el --- Block mode for Forth -*-lexical-binding: t-*-
+
 (require 'forth-mode)
+(require 'cl-lib) ; use `cl-plusp'
+
 
 (defvar forth-block-with-newlines)
 
@@ -30,7 +34,7 @@
     (save-excursion
       (forth-beginning)
       (while (forth-pad-line))
-      (while (plusp (logand (point) 1023))
+      (while (cl-plusp (logand (point) 1023))
 	(insert " "))
       (insert " "))))
 
@@ -61,7 +65,7 @@
   (setq forth-change-newlines (- (forth-count-newlines start end)
 				 forth-change-newlines))
   (message "New lines: %d" forth-change-newlines)
-  (cond ((plusp forth-change-newlines)
+  (cond ((cl-plusp forth-change-newlines)
 	 (let ((n (logand (+ (line-number-at-pos) 15) -16)))
 	   (save-excursion
 	     (forth-line (1+ n))

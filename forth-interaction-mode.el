@@ -1,3 +1,5 @@
+;;; forth-interaction-mode.el --- Interaction mode Forth -*-lexical-binding: t-*-
+
 (eval-when-compile (byte-compile-disable-warning 'cl-functions))
 
 (require 'comint)
@@ -93,7 +95,7 @@
       (add-hook 'comint-preoutput-filter-functions
 		'forth-interaction-preoutput-filter nil t)
       (setq forth-interaction-buffer buffer))))
-      
+
 ;;;###autoload
 (defun forth-restart ()
   (interactive)

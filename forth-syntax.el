@@ -19,9 +19,10 @@
     (skip-chars-forward forth-syntax-non-whitespace)
     start))
 
-;; Return the whitespace-delimited word at position POS.
-;; Return nil if POS is at end-of-buffer.
+
 (defun forth-syntax--word-at (pos)
+  "Return the whitespace-delimited word at position POS.
+Return nil if POS is at `end-of-buffer'."
   (save-excursion
     (goto-char pos)
     (let ((start (forth-syntax--skip-word)))
@@ -29,7 +30,7 @@
 	    (t (buffer-substring-no-properties start (point)))))))
 
 (defmacro forth-syntax--set-syntax (start end syntax)
-  "Set the 'syntax-table property in the region START/END to SYNTAX.
+  "Set the \\='syntax-table property in the region START/END to SYNTAX.
 SYNTAX must be a valid argument for `string-to-syntax'."
   `(put-text-property ,start ,end 'syntax-table ',(string-to-syntax syntax)))
 
