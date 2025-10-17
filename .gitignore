@@ -1,4 +1,17 @@
+# Identifies files to be ignored by Git.
+# Also used by fd|fdfind  to identify directories and files to ignore
+
+# Emacs Backup files
 *~
+
+# Byte-Compiled Emacs Lisp files
 *.elc
+
+# Emacs temporary files
+.#*
+*#
+\#*
+
+#
 *.info
 autoloads.el
