@@ -1,4 +1,7 @@
 *~
 *.elc
+.#*
+*#
+\#*
 *.info
 autoloads.el
