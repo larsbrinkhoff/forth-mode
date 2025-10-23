@@ -12,6 +12,6 @@
 *#
 \#*
 
-#
+# Project generated files
 *.info
 autoloads.el
