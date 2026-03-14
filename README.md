@@ -1,6 +1,7 @@
 ## Programming language mode for Forth.
 
 [![Build Status](https://travis-ci.org/larsbrinkhoff/forth-mode.svg)](https://travis-ci.org/larsbrinkhoff/forth-mode)
+[![NonGNU ELPA](https://elpa.nongnu.org/nongnu/forth-mode.svg)](https://elpa.nongnu.org/nongnu/forth-mode.html)
 [![MELPA](https://melpa.org/packages/forth-mode-badge.svg)](https://melpa.org/#/forth-mode)
 
 Features in progress:
@@ -15,7 +16,7 @@ Features in progress:
 
 ### Installation
 
-MELPA:  
+NonGNU ELPA (enabled by default from Emacs 28.1 onwards) or MELPA:
 
     M-x package-install forth-mode
 
