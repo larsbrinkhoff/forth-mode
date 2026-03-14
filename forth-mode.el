@@ -5,10 +5,11 @@
 ;; Keywords: languages forth
 ;; URL: http://github.com/larsbrinkhoff/forth-mode
 ;; Package-Requires: ((cl-lib "0.2"))
-;; Version: 0.2
+;; Version: 0.3
 
 ;;; Commentary:
-;; Programming language mode for Forth
+
+;; Programming language mode for Forth.
 
 ;;; Code:
 
