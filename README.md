@@ -33,7 +33,7 @@ Manual:
 ### Usage
 
 To enable Forth major mode, type `M-x forth-mode`.  The file
-extensions `.f`, `.fs`, `.fth`, and `.4th` are recognised
+extensions `.f`, `.fs`, `.fth`, `.4th` and `.forth` are recognised
 automatically.
 
 To start an interactive Forth session, type `M-x run-forth`.

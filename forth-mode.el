@@ -212,7 +212,7 @@
   (forth-mode-init-menu))
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.\\(f\\|fs\\|fth\\|4th\\)\\'" . forth-mode))
+(add-to-list 'auto-mode-alist '("\\.\\(f\\|fs\\|fth\\|4th\\|forth\\)\\'" . forth-mode))
 
 (unless (fboundp 'with-eval-after-load)
   (defmacro with-eval-after-load (lib &rest forms)
