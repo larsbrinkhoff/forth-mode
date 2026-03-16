@@ -2,6 +2,13 @@
 (require 'forth-interaction-mode)
 (require 'forth-block-mode)
 
+;; Load eglot tests only if elgot package is available
+(package-initialize t)
+(setq package-load-list '((eglot t)))
+(package-activate-all)
+(when (locate-library "eglot")
+  (load "test/forth-eglot-tests.el"))
+
 (unless forth-executable
   (setq forth-executable (getenv "FORTH")))
 
